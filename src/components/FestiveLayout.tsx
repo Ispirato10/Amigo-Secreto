@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
-import { Download, Info, Gift, Volume2, VolumeX } from 'lucide-react';
+import { Download, Info, Gift, Volume2, VolumeX, Music } from 'lucide-react';
 import { festiveAudio } from '../lib/festiveAudio';
+import { FestivePWAInstallBanner } from './FestivePWAInstallBanner';
 import festiveHeroBg from '../assets/images/festive_secret_santa_hero_1793629619164.jpg';
 
 interface FestiveLayoutProps {
@@ -11,8 +12,9 @@ interface FestiveLayoutProps {
 
 export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
   const { isInstallable, install, isIOS, isInstalled } = usePWAInstall();
-  const [showIOSGuide, setShowIOSGuide] = React.useState(false);
-  const [muted, setMuted] = React.useState(festiveAudio.isMuted());
+  const [showIOSGuide, setShowIOSGuide] = useState(false);
+  const [muted, setMuted] = useState(festiveAudio.isMuted());
+  const [isMusicPlaying, setIsMusicPlaying] = useState(festiveAudio.getIsMusicPlaying());
 
   // Generate snow particles
   const snowParticles = React.useMemo(() => 
@@ -25,15 +27,15 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
     })), []);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans selection:bg-red-200 selection:text-red-900">
-      {/* Background festive image with overlay */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-red-500 selection:text-white">
+      {/* Background festive image with rich overlay */}
       <div className="fixed inset-0 z-0">
         <img 
           src={festiveHeroBg || '/assets/images/festive_secret_santa_hero_1793629619164.jpg'} 
           alt="Festive background"
-          className="w-full h-full object-cover opacity-10 dark:opacity-20"
+          className="w-full h-full object-cover opacity-35 filter brightness-90"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-transparent to-white/50 dark:from-black/50 dark:to-black/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/60 to-slate-950/90" />
       </div>
 
       {/* Snowfall effect */}
@@ -74,6 +76,27 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
         </div>
 
         <nav className="flex items-center gap-2 md:gap-3">
+          {/* Discreet Music Toggle Button */}
+          <button
+            onClick={() => {
+              const playing = festiveAudio.toggleMusic();
+              setIsMusicPlaying(playing);
+            }}
+            className={`p-2 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-bold ${
+              isMusicPlaying
+                ? 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/60 ring-1 ring-red-400/40'
+                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800'
+            }`}
+            title={isMusicPlaying ? "Pausar Trilha Natalina (Jingle Bells)" : "Tocar Trilha Natalina (Jingle Bells)"}
+            aria-label="Alternar Música Natalina"
+          >
+            <Music className={`w-4 h-4 ${isMusicPlaying ? 'animate-bounce text-red-600' : ''}`} />
+            <span className="hidden sm:inline text-[11px]">
+              {isMusicPlaying ? 'Música Tocando' : 'Música Pausada'}
+            </span>
+          </button>
+
+          {/* Sound Effect Mute Button */}
           <button
             onClick={() => {
               const newMuted = festiveAudio.toggleMute();
@@ -155,6 +178,9 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Floating Animated PWA Install Suggestion Banner */}
+      <FestivePWAInstallBanner />
 
       {/* Footer */}
       <footer className="relative z-20 py-8 text-center text-slate-400 text-sm">

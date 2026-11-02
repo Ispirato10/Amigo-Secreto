@@ -4,11 +4,41 @@
 class FestiveAudioService {
   private ctx: AudioContext | null = null;
   private muted: boolean = false;
+  private isMusicPlaying: boolean = true;
+  private musicLoopTimeout: NodeJS.Timeout | null = null;
 
   constructor() {
     // Check localStorage for mute preference
     if (typeof window !== 'undefined') {
       this.muted = localStorage.getItem('amigo-secreto-muted') === 'true';
+      const savedMusic = localStorage.getItem('amigo-secreto-music');
+      if (savedMusic !== null) {
+        this.isMusicPlaying = savedMusic === 'true';
+      }
+
+      // Automatically start background music on first user interaction to bypass browser autoplay policy
+      const unlockAudio = () => {
+        if (this.isMusicPlaying && !this.muted) {
+          const ctx = this.getAudioContext();
+          if (ctx && ctx.state === 'running') {
+            this.startBackgroundMusic();
+            window.removeEventListener('click', unlockAudio);
+            window.removeEventListener('keydown', unlockAudio);
+            window.removeEventListener('touchstart', unlockAudio);
+          }
+        }
+      };
+
+      window.addEventListener('click', unlockAudio, { once: true });
+      window.addEventListener('keydown', unlockAudio, { once: true });
+      window.addEventListener('touchstart', unlockAudio, { once: true });
+
+      // Also try starting immediately
+      setTimeout(() => {
+        if (this.isMusicPlaying && !this.muted) {
+          this.startBackgroundMusic();
+        }
+      }, 500);
     }
   }
 
@@ -66,11 +96,9 @@ class FestiveAudioService {
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, startTime);
 
-    // Harmonic bell shimmer (2.76x frequency creates typical holiday celesta/glockenspiel tone)
     overtone.type = 'triangle';
     overtone.frequency.setValueAtTime(freq * 2.76, startTime);
 
-    // Envelope
     gainNode.gain.setValueAtTime(0.0001, startTime);
     gainNode.gain.exponentialRampToValueAtTime(gainValue, startTime + 0.015);
     gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
@@ -83,6 +111,45 @@ class FestiveAudioService {
     overtone.start(startTime);
     osc.stop(startTime + duration + 0.05);
     overtone.stop(startTime + duration + 0.05);
+  }
+
+  private playBgBellNote(
+    ctx: AudioContext, 
+    freq: number, 
+    startTime: number, 
+    duration: number, 
+    gainValue = 0.18
+  ) {
+    if (!this.isMusicPlaying) return;
+    const osc = ctx.createOscillator();
+    const overtone = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, startTime);
+
+    overtone.type = 'triangle';
+    overtone.frequency.setValueAtTime(freq * 2.76, startTime);
+
+    gainNode.gain.setValueAtTime(0.0001, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(gainValue, startTime + 0.015);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    osc.connect(gainNode);
+    overtone.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    osc.start(startTime);
+    overtone.start(startTime);
+    osc.stop(startTime + duration + 0.05);
+    overtone.stop(startTime + duration + 0.05);
+
+    const sourceObj = { osc, overtone, gain: gainNode };
+    this.bgActiveSources.push(sourceObj);
+
+    setTimeout(() => {
+      this.bgActiveSources = this.bgActiveSources.filter(s => s !== sourceObj);
+    }, (startTime - ctx.currentTime + duration + 0.1) * 1000);
   }
 
   /**
@@ -182,6 +249,152 @@ class FestiveAudioService {
     notes.forEach((item) => {
       this.playBellNote(ctx, item.f, now + item.t, item.d, 0.22);
     });
+  }
+  private bgActiveSources: { osc: OscillatorNode; overtone: OscillatorNode; gain: GainNode }[] = [];
+
+  public toggleMusic(): boolean {
+    if (this.isMusicPlaying) {
+      this.stopBackgroundMusic();
+      return false;
+    } else {
+      this.startBackgroundMusic();
+      return true;
+    }
+  }
+
+  public getIsMusicPlaying(): boolean {
+    return this.isMusicPlaying;
+  }
+
+  public startBackgroundMusic(): void {
+    if (typeof window === 'undefined') return;
+    this.isMusicPlaying = true;
+    localStorage.setItem('amigo-secreto-music', 'true');
+    this.playJingleBellsLoop();
+  }
+
+  public stopBackgroundMusic(): void {
+    this.isMusicPlaying = false;
+    localStorage.setItem('amigo-secreto-music', 'false');
+    if (this.musicLoopTimeout) {
+      clearTimeout(this.musicLoopTimeout);
+      this.musicLoopTimeout = null;
+    }
+    // Stop all active background oscillators immediately
+    this.bgActiveSources.forEach(s => {
+      try {
+        s.gain.gain.setValueAtTime(0, 0);
+        s.osc.stop();
+        s.overtone.stop();
+      } catch (e) {
+        // already stopped
+      }
+    });
+    this.bgActiveSources = [];
+  }
+
+  private playJingleBellsLoop(): void {
+    if (!this.isMusicPlaying || this.muted) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    const tempo = 130; // BPM
+    const beat = 60 / tempo; // ~0.46s
+    const now = ctx.currentTime + 0.05;
+
+    // Frequencies
+    const C5 = 523.25;
+    const D5 = 587.33;
+    const E5 = 659.25;
+    const F5 = 698.46;
+    const G5 = 783.99;
+
+    const melody = [
+      // Chorus 1: Jingle bells, jingle bells, jingle all the way
+      { f: E5, d: 0.8, t: 0 },
+      { f: E5, d: 0.8, t: 1 },
+      { f: E5, d: 1.6, t: 2 },
+
+      { f: E5, d: 0.8, t: 4 },
+      { f: E5, d: 0.8, t: 5 },
+      { f: E5, d: 1.6, t: 6 },
+
+      { f: E5, d: 0.8, t: 8 },
+      { f: G5, d: 0.8, t: 9 },
+      { f: C5, d: 1.2, t: 10 },
+      { f: D5, d: 0.4, t: 11.2 },
+      { f: E5, d: 3.2, t: 12 },
+
+      // Oh what fun it is to ride in a one-horse open sleigh
+      { f: F5, d: 0.8, t: 16 },
+      { f: F5, d: 0.8, t: 17 },
+      { f: F5, d: 1.2, t: 18 },
+      { f: F5, d: 0.4, t: 19.2 },
+      { f: F5, d: 0.8, t: 20 },
+      { f: E5, d: 0.8, t: 21 },
+      { f: E5, d: 0.8, t: 22 },
+      { f: E5, d: 0.4, t: 23 },
+      { f: E5, d: 0.4, t: 23.5 },
+
+      { f: E5, d: 0.8, t: 24 },
+      { f: D5, d: 0.8, t: 25 },
+      { f: D5, d: 0.8, t: 26 },
+      { f: E5, d: 0.8, t: 27 },
+      { f: D5, d: 1.6, t: 28 },
+      { f: G5, d: 1.6, t: 30 },
+
+      // Chorus 2: Jingle bells, jingle bells, jingle all the way
+      { f: E5, d: 0.8, t: 32 },
+      { f: E5, d: 0.8, t: 33 },
+      { f: E5, d: 1.6, t: 34 },
+
+      { f: E5, d: 0.8, t: 36 },
+      { f: E5, d: 0.8, t: 37 },
+      { f: E5, d: 1.6, t: 38 },
+
+      { f: E5, d: 0.8, t: 40 },
+      { f: G5, d: 0.8, t: 41 },
+      { f: C5, d: 1.2, t: 42 },
+      { f: D5, d: 0.4, t: 43.2 },
+      { f: E5, d: 3.2, t: 44 },
+
+      // Oh what fun it is to ride in a one-horse open sleigh
+      { f: F5, d: 0.8, t: 48 },
+      { f: F5, d: 0.8, t: 49 },
+      { f: F5, d: 1.2, t: 50 },
+      { f: F5, d: 0.4, t: 51.2 },
+      { f: F5, d: 0.8, t: 52 },
+      { f: E5, d: 0.8, t: 53 },
+      { f: E5, d: 0.8, t: 54 },
+      { f: E5, d: 0.4, t: 55 },
+      { f: E5, d: 0.4, t: 55.5 },
+
+      { f: G5, d: 0.8, t: 56 },
+      { f: G5, d: 0.8, t: 57 },
+      { f: F5, d: 0.8, t: 58 },
+      { f: D5, d: 0.8, t: 59 },
+      { f: C5, d: 3.2, t: 60 }
+    ];
+
+    const totalDurationBeats = 64;
+    const totalDurationMs = totalDurationBeats * beat * 1000;
+
+    melody.forEach(note => {
+      if (!this.isMusicPlaying) return;
+      this.playBgBellNote(
+        ctx, 
+        note.f, 
+        now + note.t * beat, 
+        note.d * beat, 
+        0.12 // Soft background music volume
+      );
+    });
+
+    this.musicLoopTimeout = setTimeout(() => {
+      if (this.isMusicPlaying) {
+        this.playJingleBellsLoop();
+      }
+    }, totalDurationMs);
   }
 }
 

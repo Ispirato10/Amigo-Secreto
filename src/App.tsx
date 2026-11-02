@@ -36,7 +36,9 @@ import {
   ArrowLeft,
   Package,
   Edit3,
-  Share2
+  Share2,
+  RotateCcw,
+  RefreshCw
 } from 'lucide-react';
 import { festiveAudio } from './lib/festiveAudio';
 import { FestiveWaitingHero } from './components/FestiveWaitingHero';
@@ -45,6 +47,9 @@ import { FestiveGiftSavedModal } from './components/FestiveGiftSavedModal';
 import { AdminParticipantManager } from './components/AdminParticipantManager';
 import { FestiveRevealExperience } from './components/FestiveRevealExperience';
 import { FestiveFamilyInviteModal } from './components/FestiveFamilyInviteModal';
+import { FestiveResetRoomModal } from './components/FestiveResetRoomModal';
+import { FestiveDrawCountdownOverlay } from './components/FestiveDrawCountdownOverlay';
+import { FestiveChristmasCountdownClock } from './components/FestiveChristmasCountdownClock';
 import confetti from 'canvas-confetti';
 
 // --- Types ---
@@ -104,6 +109,8 @@ export default function App() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showGiftSavedModal, setShowGiftSavedModal] = useState<boolean>(false);
   const [showFamilyInviteModal, setShowFamilyInviteModal] = useState<boolean>(false);
+  const [roomToReset, setRoomToReset] = useState<{ id: string; name: string } | null>(null);
+  const [showDrawCountdown, setShowDrawCountdown] = useState<boolean>(false);
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -586,12 +593,18 @@ export default function App() {
     }
   };
 
-  // --- Admin: Start Draw ---
-  const handleStartDraw = async () => {
+  // --- Admin: Start Draw (Triggers Spectacular Countdown) ---
+  const handleStartDraw = () => {
     if (!room || participants.length < 3) {
       setError("Mínimo de 3 participantes para realizar o sorteio.");
       return;
     }
+    setError(null);
+    setShowDrawCountdown(true);
+  };
+
+  const handleExecuteDraw = async () => {
+    if (!room || participants.length < 3) return;
     
     setLoading(true);
     try {
@@ -618,16 +631,18 @@ export default function App() {
       await Promise.all(promises);
       await updateDoc(doc(db, 'rooms', room.id), { status: 'FINISHED' });
       setRoom({ ...room, status: 'FINISHED' });
+      setShowDrawCountdown(false);
       festiveAudio.playDrawFinished();
       confetti({
-        particleCount: 150,
-        spread: 90,
+        particleCount: 180,
+        spread: 100,
         origin: { y: 0.5 },
         colors: ['#ff0000', '#ffd700', '#22c55e', '#ffffff']
       });
     } catch (err) {
       console.error(err);
       setError("Erro ao realizar sorteio.");
+      setShowDrawCountdown(false);
     } finally {
       setLoading(false);
     }
@@ -656,6 +671,57 @@ export default function App() {
     } catch (err) {
       console.error("Erro ao excluir sala:", err);
       setError("Erro ao excluir sala.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- Admin: Reset / Reuse Room for New Draw (Password 123) ---
+  const handleResetRoom = async (targetRoomId: string, passwordInput: string): Promise<boolean> => {
+    if (passwordInput.trim() !== '123') {
+      setError("Senha incorreta! A senha para reabrir a sala é 123.");
+      return false;
+    }
+
+    setLoading(true);
+    try {
+      // 1. Delete all draw result docs for this room via participant IDs
+      const partDocs = await getDocs(collection(db, `rooms/${targetRoomId}/participants`));
+      const partDeletes = partDocs.docs.map(pDoc => deleteDoc(doc(db, `rooms/${targetRoomId}/results`, pDoc.id)));
+      await Promise.all(partDeletes);
+
+      // Extra cleanup via results collection list
+      try {
+        const resultsSnap = await getDocs(collection(db, `rooms/${targetRoomId}/results`));
+        const extraDeletes = resultsSnap.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(extraDeletes);
+      } catch (e) {
+        console.log("Result cleanup done:", e);
+      }
+
+      // 2. Reset status of room to 'WAITING'
+      await updateDoc(doc(db, 'rooms', targetRoomId), {
+        status: 'WAITING',
+        resetAt: serverTimestamp()
+      });
+
+      if (room?.id === targetRoomId) {
+        setRoom(prev => prev ? { ...prev, status: 'WAITING' } : null);
+      }
+      setResult(null);
+      setSuccessMessage("✨ Sala reaberta com sucesso! Todos os participantes permanecem na sala e um novo sorteio pode ser realizado.");
+      festiveAudio.playJingle();
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ef4444', '#eab308', '#22c55e']
+      });
+      return true;
+    } catch (err) {
+      console.error("Erro ao reabrir sala:", err);
+      setError("Erro ao reabrir sala. Tente novamente.");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -1585,6 +1651,19 @@ export default function App() {
                           </div>
 
                           <div className="flex items-center gap-2">
+                            {/* Reutilizar Sala (Senha 123) */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setRoomToReset({ id: r.id, name: r.name });
+                              }}
+                              className="px-3 py-2 text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 hover:bg-amber-200 dark:hover:bg-amber-900/60 rounded-xl transition-all flex items-center gap-1 shrink-0"
+                              title="Reutilizar / Reabrir Sala (Senha 123)"
+                            >
+                              <RotateCcw className="w-4 h-4 text-amber-600" />
+                              <span className="hidden sm:inline">Reutilizar Sala</span>
+                            </button>
+
                             {/* Excluir sala: apenas o adm poderá excluir salas */}
                             <button 
                               onClick={(e) => {
@@ -1649,6 +1728,17 @@ export default function App() {
                         >
                           <Play className="w-4 h-4 fill-current" />
                           <span>Realizar Sorteio Agora ({participants.length}/3)</span>
+                        </button>
+                      )}
+
+                      {room.status === 'FINISHED' && (
+                        <button 
+                          onClick={() => setRoomToReset({ id: room.id, name: room.name })}
+                          className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all shrink-0"
+                          title="Reabrir sala para novo sorteio (Senha 123)"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                          <span>Reutilizar Sala (Senha 123)</span>
                         </button>
                       )}
 
@@ -1786,6 +1876,9 @@ export default function App() {
                     giftBoxesCount={giftBoxes.filter(b => b.trim().length > 0).length}
                     onEditGifts={() => setView('PROFILE')}
                   />
+
+                  {/* Live Festive Christmas & Draw Countdown Clock */}
+                  <FestiveChristmasCountdownClock title="Cronômetro Mágico do Sorteio 🎄" />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Participant's current gift boxes overview */}
@@ -1955,6 +2048,23 @@ export default function App() {
         onClose={() => setShowFamilyInviteModal(false)}
         roomId={room?.id}
         roomName={room?.name}
+      />
+
+      {/* Festive Reset Room Modal (Password 123) */}
+      <FestiveResetRoomModal
+        isOpen={!!roomToReset}
+        onClose={() => setRoomToReset(null)}
+        roomId={roomToReset?.id || ''}
+        roomName={roomToReset?.name || ''}
+        onConfirmReset={handleResetRoom}
+      />
+
+      {/* Spectacular 10-Second Draw Countdown Overlay */}
+      <FestiveDrawCountdownOverlay
+        isOpen={showDrawCountdown}
+        durationSeconds={10}
+        onCountdownComplete={handleExecuteDraw}
+        onCancel={() => setShowDrawCountdown(false)}
       />
     </FestiveLayout>
 

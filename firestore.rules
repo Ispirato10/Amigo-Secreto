@@ -37,51 +37,20 @@ service cloud.firestore {
 
     // Room rules
     match /rooms/{roomId} {
-      // Allow reading and listing rooms so the admin can manage all rooms
-      allow get, list: if true;
-      
-      allow create: if (
-        incoming().name is string && incoming().name.size() <= 100 &&
-        incoming().status == 'WAITING'
-      );
-      
-      allow update: if (
-        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'giftList', 'name'])
-      );
-
-      allow delete: if true;
+      // Allow reading, listing, creating, updating and deleting rooms
+      allow get, list, create, update, delete: if true;
     }
 
     // Participant rules
     match /rooms/{roomId}/participants/{participantId} {
-      // Everyone in the room can list and view participants
-      allow list, get: if true;
-      
-      allow create: if (
-        incoming().name is string && incoming().name.size() <= 100
-      );
-      
-      allow update: if (
-        incoming().diff(existing()).affectedKeys().hasOnly(['wishlist', 'giftBoxes', 'name', 'password'])
-      );
-
-      allow delete: if true;
+      // Everyone in the room can list, view, create, update and delete participants
+      allow get, list, create, update, delete: if true;
     }
 
     // Result rules
     match /rooms/{roomId}/results/{participantId} {
-      // Direct single-document get: allowed so participant can see their secret friend
-      // List is denied: guaranteeing total anonymity (no one can query all results)
-      allow get: if true;
-      allow list: if false;
-      
-      allow create: if (
-        incoming().targetId is string &&
-        incoming().targetName is string
-      );
-      
-      allow update: if false;
-      allow delete: if true;
+      // Allow reading, listing (for reset cleanup), creating, updating, and deleting
+      allow get, list, create, update, delete: if true;
     }
   }
 }
