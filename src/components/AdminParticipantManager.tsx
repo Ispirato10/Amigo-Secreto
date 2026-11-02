@@ -197,23 +197,23 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 dark:border-slate-800 space-y-6">
+    <div className="bg-slate-900 rounded-3xl p-6 md:p-8 shadow-xl border border-slate-700 space-y-6">
       
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 font-bold text-xs uppercase tracking-wider">
+            <span className="px-3 py-1 rounded-full bg-red-950 text-red-400 font-bold text-xs uppercase tracking-wider border border-red-900/50">
               Painel do Administrador
             </span>
-            <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
-              <Users className="w-3.5 h-3.5 text-red-600" /> {participants.length} Participantes
+            <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+              <Users className="w-3.5 h-3.5 text-red-500" /> {participants.length} Participantes
             </span>
           </div>
-          <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-            Gerenciar Participantes da Sala
+          <h3 className="text-2xl font-black text-white mt-1">
+            Gerenciar Participantes
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-400">
             Edite nomes, altere caixas de presentes ou remova participantes.
           </p>
         </div>
@@ -229,17 +229,17 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
       </div>
 
       {/* STRICT PRIVACY BANNER */}
-      <div className="p-4 bg-gradient-to-r from-amber-50 via-red-50 to-amber-50 dark:from-amber-950/30 dark:via-red-950/30 dark:to-amber-950/30 border-2 border-amber-300 dark:border-amber-800/60 rounded-2xl flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md">
+      <div className="p-4 bg-slate-900 border-2 border-slate-700 rounded-2xl flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-red-950 text-red-400 flex items-center justify-center shrink-0 shadow-md">
           <Lock className="w-5 h-5" />
         </div>
         <div className="text-xs space-y-0.5">
-          <strong className="text-slate-900 dark:text-amber-200 font-black flex items-center gap-1.5 uppercase tracking-wide">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <strong className="text-white font-black flex items-center gap-1.5 uppercase tracking-wide">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
             Sigilo Absoluto dos Sorteados Garantido
           </strong>
-          <p className="text-slate-600 dark:text-slate-300 font-medium">
-            Você pode editar dados e gerenciar os integrantes da sala, mas <span className="font-bold underline text-red-600 dark:text-red-400">jamais poderá ver quem tirou quem</span>. Os resultados permanecem totalmente secretos e visíveis exclusivamente para cada sorteado ao consultar seu amigo secreto.
+          <p className="text-slate-300 font-medium">
+            Você pode editar dados e gerenciar os integrantes da sala, mas <span className="font-bold underline text-red-400">jamais poderá ver quem tirou quem</span>. Os resultados permanecem totalmente secretos e visíveis exclusivamente para cada sorteado ao consultar seu amigo secreto.
           </p>
         </div>
       </div>
@@ -334,18 +334,18 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 my-8"
+              className="w-full max-w-lg bg-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-700 space-y-6 my-8"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2.5 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-600">
+                  <div className="p-2.5 rounded-xl bg-red-950 text-red-400">
                     <Edit3 className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                    <h3 className="text-xl font-black text-white">
                       Editar Participante
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       Modifique o nome ou os presentes desejados
                     </p>
                   </div>
@@ -353,7 +353,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
 
                 <button
                   onClick={() => setEditingParticipant(null)}
-                  className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -455,18 +455,18 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 my-8"
+              className="w-full max-w-lg bg-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-700 space-y-6 my-8"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2.5 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-600">
+                  <div className="p-2.5 rounded-xl bg-red-950 text-red-400">
                     <UserPlus className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                    <h3 className="text-xl font-black text-white">
                       Cadastrar Participante
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       Adicione um novo integrante diretamente à sala
                     </p>
                   </div>
@@ -474,7 +474,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
 
                 <button
                   onClick={() => setIsAddingNew(false)}
-                  className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl"
+                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -583,18 +583,18 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-red-200 dark:border-red-900/40 text-center space-y-6"
+              className="w-full max-w-md bg-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-red-900/40 text-center space-y-6"
             >
-              <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center mx-auto shadow-inner">
+              <div className="w-16 h-16 rounded-full bg-red-950 text-red-400 flex items-center justify-center mx-auto shadow-inner">
                 <AlertTriangle className="w-8 h-8" />
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white">
+                <h3 className="text-2xl font-black text-white">
                   Remover Participante?
                 </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
-                  Tem certeza que deseja remover <strong className="text-red-600">{deletingParticipant.name}</strong> da sala <strong className="text-slate-900 dark:text-white">{roomName}</strong>?
+                <p className="text-sm text-slate-300 mt-2">
+                  Tem certeza que deseja remover <strong className="text-red-500">{deletingParticipant.name}</strong> da sala <strong className="text-white">{roomName}</strong>?
                 </p>
                 <p className="text-xs text-slate-400 mt-2 leading-relaxed">
                   Esta ação excluirá a participação de {deletingParticipant.name} nesta sala.
@@ -605,7 +605,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
                 <button
                   type="button"
                   onClick={() => setDeletingParticipant(null)}
-                  className="flex-1 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800"
+                  className="flex-1 py-3 rounded-xl border border-slate-700 text-slate-300 font-bold text-xs hover:bg-slate-800"
                 >
                   Cancelar
                 </button>
@@ -613,7 +613,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
                   type="button"
                   onClick={handleConfirmDelete}
                   disabled={isDeleting}
-                  className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-1.5"
+                  className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-900/40 transition-all flex items-center justify-center gap-1.5"
                 >
                   <Trash2 className="w-4 h-4" />
                   <span>{isDeleting ? "Removendo..." : "Confirmar Remoção"}</span>

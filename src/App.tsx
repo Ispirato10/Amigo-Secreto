@@ -1632,56 +1632,55 @@ export default function App() {
                       </h3>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 gap-3">
                       {allRooms.map((r, idx) => (
                         <div 
                           key={`room-${r.id || idx}`} 
-                          className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex items-center justify-between hover:border-red-600 transition-colors group"
+                          className="bg-slate-900 p-4 rounded-2xl border border-slate-700 flex items-center justify-between hover:border-red-600 transition-colors group"
                         >
-                          <div className="space-y-1">
-                            <h4 className="font-bold text-white text-base">{r.name}</h4>
-                            <p className="text-xs text-slate-300 font-mono">ID: {r.id}</p>
-                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block ${
-                              r.status === 'FINISHED' 
-                                ? 'bg-green-900 text-green-200' 
-                                : 'bg-blue-900 text-blue-200'
-                            }`}>
-                              {r.status === 'FINISHED' ? 'Sorteio Realizado' : 'Aguardando Sorteio'}
-                            </span>
+                          <div className="space-y-1 min-w-0 flex-1">
+                            <h4 className="font-bold text-white text-base truncate">{r.name}</h4>
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs text-slate-300 font-mono shrink-0">ID: {r.id}</p>
+                              <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block ${
+                                r.status === 'FINISHED' 
+                                  ? 'bg-green-900 text-green-200' 
+                                  : 'bg-blue-900 text-blue-200'
+                              }`}>
+                                {r.status === 'FINISHED' ? 'Finalizado' : 'Aguardando'}
+                              </span>
+                            </div>
                           </div>
 
-                          <div className="flex items-center gap-2">
-                            {/* Reutilizar Sala (Senha 123) */}
+                          <div className="flex items-center gap-1.5 ml-3 shrink-0">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setRoomToReset({ id: r.id, name: r.name });
                               }}
-                              className="px-3 py-2 text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 hover:bg-amber-200 dark:hover:bg-amber-900/60 rounded-xl transition-all flex items-center gap-1 shrink-0"
-                              title="Reutilizar / Reabrir Sala (Senha 123)"
+                              className="p-2.5 bg-amber-900/30 text-amber-400 rounded-xl transition-all"
+                              title="Reutilizar"
                             >
-                              <RotateCcw className="w-4 h-4 text-amber-600" />
-                              <span className="hidden sm:inline">Reutilizar Sala</span>
+                              <RotateCcw className="w-4 h-4" />
                             </button>
 
-                            {/* Excluir sala: apenas o adm poderá excluir salas */}
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setRoomToDelete({ id: r.id, name: r.name });
                               }}
-                              className="p-3 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl transition-all"
-                              title="Excluir Sala (Apenas Administrador)"
+                              className="p-2.5 text-slate-500 hover:text-red-500 hover:bg-red-950/20 rounded-xl transition-all"
+                              title="Excluir"
                             >
-                              <Trash2 className="w-5 h-5" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
 
                             <button 
                               onClick={() => setRoom(r)}
-                              className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl group-hover:bg-red-600 group-hover:text-white transition-all"
-                              title="Gerenciar Sala"
+                              className="p-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-md"
+                              title="Gerenciar"
                             >
-                              <ArrowRight className="w-5 h-5" />
+                              <ArrowRight className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
@@ -1706,15 +1705,15 @@ export default function App() {
 
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                      <h2 className="text-3xl font-black text-slate-900 dark:text-white">{room.name}</h2>
-                      <p className="text-slate-500 flex items-center gap-2 mt-1 text-xs font-semibold">
+                      <h2 className="text-3xl font-black text-white">{room.name}</h2>
+                      <p className="text-slate-400 flex items-center gap-2 mt-1 text-xs font-semibold">
                         Status da Sala:
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
                           room.status === 'FINISHED'
-                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                            : 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                            ? 'bg-emerald-950 text-emerald-300'
+                            : 'bg-blue-950 text-blue-300'
                         }`}>
-                          {room.status === 'FINISHED' ? 'Sorteio Finalizado' : 'Aguardando Início do Sorteio'}
+                          {room.status === 'FINISHED' ? 'Sorteio Finalizado' : 'Aguardando Início'}
                         </span>
                       </p>
                     </div>
@@ -1744,7 +1743,7 @@ export default function App() {
 
                       <button
                         onClick={() => setRoomToDelete({ id: room.id, name: room.name })}
-                        className="flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl border border-red-200 dark:border-red-900/40 transition-colors"
+                        className="flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-bold text-red-400 bg-red-950/40 hover:bg-red-900/40 rounded-xl border border-red-900/40 transition-colors"
                         title="Excluir Sala permanentemente"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1764,26 +1763,26 @@ export default function App() {
                   />
 
                   {/* Convite & Compartilhamento da Chave da Sala pelo ADM */}
-                  <div className="bg-gradient-to-br from-red-50 via-amber-50 to-red-50 dark:from-red-950/40 dark:via-slate-900 dark:to-red-950/40 p-6 rounded-3xl border-2 border-red-200 dark:border-red-900/40 space-y-4 shadow-lg shadow-red-500/5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-red-200/60 dark:border-red-900/40 pb-3">
+                  <div className="bg-slate-900 p-6 rounded-3xl border-2 border-slate-700 space-y-4 shadow-lg shadow-black/40">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700 pb-3">
                       <div>
-                        <h3 className="font-black text-red-900 dark:text-red-300 text-lg flex items-center gap-2">
-                          <Share2 className="w-5 h-5 text-red-600" />
+                        <h3 className="font-black text-white text-lg flex items-center gap-2">
+                          <Share2 className="w-5 h-5 text-red-500" />
                           Compartilhar Chave da Sala via WhatsApp
                         </h3>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                        <p className="text-xs text-slate-300 mt-0.5">
                           Envie a chave da sala e o link direto para os participantes entrarem!
                         </p>
                       </div>
-                      <span className="px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 text-[10px] font-black uppercase tracking-wider rounded-full self-start sm:self-auto">
+                      <span className="px-3 py-1 bg-emerald-950 text-emerald-200 text-[10px] font-black uppercase tracking-wider rounded-full self-start sm:self-auto">
                         Link Oficial Vercel
                       </span>
                     </div>
 
                     {/* Room ID display & copy */}
                     <div className="flex flex-col sm:flex-row items-stretch gap-3">
-                      <div className="flex-1 p-3 bg-white dark:bg-slate-900 rounded-2xl font-mono text-center text-red-600 font-black border-2 border-red-200 dark:border-red-800 text-sm flex items-center justify-center gap-2 shadow-inner">
-                        <span className="text-xs font-bold text-slate-400 font-sans uppercase">Chave:</span>
+                      <div className="flex-1 p-3 bg-slate-950 rounded-2xl font-mono text-center text-red-400 font-black border-2 border-red-900/50 text-sm flex items-center justify-center gap-2 shadow-inner">
+                        <span className="text-xs font-bold text-slate-500 font-sans uppercase">Chave:</span>
                         <span>{room.id}</span>
                       </div>
 
@@ -1791,13 +1790,13 @@ export default function App() {
                         onClick={() => {
                           const url = `https://meuamigofamily.vercel.app?room=${room.id}`;
                           navigator.clipboard.writeText(url);
-                          setSuccessMessage("Link da sala (meuamigofamily.vercel.app) copiado para a área de transferência!");
+                          setSuccessMessage("Link da sala copiado!");
                           festiveAudio.playJingle();
                         }}
-                        className="px-4 py-3 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
-                        title="Copiar Link direto da Sala"
+                        className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                        title="Copiar Link"
                       >
-                        <Clipboard className="w-4 h-4 text-red-600" />
+                        <Clipboard className="w-4 h-4 text-red-500" />
                         <span>Copiar Link</span>
                       </button>
 
@@ -1816,13 +1815,13 @@ export default function App() {
                       </button>
                     </div>
 
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between pt-1">
-                      <span>Link gerado: <strong className="text-red-600">https://meuamigofamily.vercel.app?room={room.id}</strong></span>
+                    <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1">
+                      <span>Link gerado: <strong className="text-red-500">meuamigofamily.vercel.app?room={room.id}</strong></span>
                       <button
                         onClick={() => setShowFamilyInviteModal(true)}
-                        className="text-red-600 hover:underline font-bold"
+                        className="text-red-400 hover:text-red-300 hover:underline font-bold"
                       >
-                        Ver Cartão de Convite Completo
+                        Ver Cartão de Convite
                       </button>
                     </div>
                   </div>
@@ -1840,11 +1839,11 @@ export default function App() {
               className="space-y-8"
             >
               {/* Top Bar inside Room */}
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-center sm:text-left space-y-1">
-                  <span className="text-[11px] uppercase tracking-wider font-bold text-red-600">Sala do Sorteio</span>
-                  <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">{room.name}</h2>
-                  <p className="text-xs text-slate-500">Participante: <strong className="text-slate-800 dark:text-slate-200">{user.name}</strong></p>
+                  <span className="text-[11px] uppercase tracking-wider font-bold text-red-500">Sala do Sorteio</span>
+                  <h2 className="text-2xl md:text-3xl font-black text-white">{room.name}</h2>
+                  <p className="text-xs text-slate-400">Participante: <strong className="text-slate-200">{user.name}</strong></p>
                 </div>
 
                 <div className="flex items-center gap-2">
