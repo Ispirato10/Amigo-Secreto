@@ -33,9 +33,9 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
         <img 
           src={festiveHeroBg || '/assets/images/festive_secret_santa_hero_1793629619164.jpg'} 
           alt="Festive background"
-          className="w-full h-full object-cover opacity-25 filter brightness-90"
+          className="w-full h-full object-cover opacity-50 filter brightness-100"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-950/70 to-slate-950/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/50 to-slate-950/85" />
       </div>
 
       {/* Snowfall effect */}
