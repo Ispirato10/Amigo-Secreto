@@ -250,18 +250,18 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
           const filledBoxes = p.giftBoxes?.filter(g => g.trim().length > 0) || [];
 
           return (
-            <motion.div
+             <motion.div
               key={`admin-part-${p.id || index}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-4 bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-red-300 dark:hover:border-red-900/50 transition-all group"
+              className="p-4 bg-slate-800 rounded-2xl border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-red-600 transition-all group"
             >
               <div className="space-y-1.5 min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 text-xs font-black flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-full bg-red-900 text-red-200 text-xs font-black flex items-center justify-center">
                     {index + 1}
                   </span>
-                  <h4 className="font-black text-slate-900 dark:text-white text-base truncate">
+                  <h4 className="font-black text-white text-base truncate">
                     {p.name}
                   </h4>
                 </div>
@@ -272,17 +272,17 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
                     filledBoxes.map((g, gi) => (
                       <span
                         key={`admin-box-tag-${gi}`}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs font-medium border border-slate-200 dark:border-slate-800 shadow-2xs"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 text-slate-200 text-xs font-medium border border-slate-700 shadow-2xs"
                       >
-                        <Package className="w-3 h-3 text-red-600" />
-                        <span className="font-bold text-[11px] text-red-600">#{gi + 1}:</span>
+                        <Package className="w-3 h-3 text-red-500" />
+                        <span className="font-bold text-[11px] text-red-400">#{gi + 1}:</span>
                         <span className="max-w-[150px] truncate">{g}</span>
                       </span>
                     ))
                   ) : (
-                    <span className="text-xs text-amber-600 dark:text-amber-400 italic flex items-center gap-1">
+                    <span className="text-xs text-amber-400 italic flex items-center gap-1">
                       <Info className="w-3.5 h-3.5" />
-                      Nenhum presente preenchido ainda nas caixas
+                      Nenhum presente preenchido
                     </span>
                   )}
                 </div>
