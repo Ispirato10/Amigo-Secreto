@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // User profile rules (Participant basic registration & gift boxes wishlist)
+    match /users/{userId} {
+      allow get, list: if true;
+      
+      allow create: if (
+        incoming().name is string && incoming().name.size() <= 100 &&
+        incoming().password is string && incoming().password.size() <= 50
+      );
+      
+      allow update: if (
+        incoming().diff(existing()).affectedKeys().hasOnly(['giftBoxes', 'name', 'password', 'updatedAt'])
+      );
+
+      allow delete: if true;
+    }
+
+    // Room rules
+    match /rooms/{roomId} {
+      // Allow reading and listing rooms so the admin can manage all rooms
+      allow get, list: if true;
+      
+      allow create: if (
+        incoming().name is string && incoming().name.size() <= 100 &&
+        incoming().status == 'WAITING'
+      );
+      
+      allow update: if (
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'giftList', 'name'])
+      );
+
+      allow delete: if true;
+    }
+
+    // Participant rules
+    match /rooms/{roomId}/participants/{participantId} {
+      // Everyone in the room can list and view participants
+      allow list, get: if true;
+      
+      allow create: if (
+        incoming().name is string && incoming().name.size() <= 100
+      );
+      
+      allow update: if (
+        incoming().diff(existing()).affectedKeys().hasOnly(['wishlist', 'giftBoxes', 'name', 'password'])
+      );
+
+      allow delete: if true;
+    }
+
+    // Result rules
+    match /rooms/{roomId}/results/{participantId} {
+      // Direct single-document get: allowed so participant can see their secret friend
+      // List is denied: guaranteeing total anonymity (no one can query all results)
+      allow get: if true;
+      allow list: if false;
+      
+      allow create: if (
+        incoming().targetId is string &&
+        incoming().targetName is string
+      );
+      
+      allow update: if false;
+      allow delete: if true;
+    }
+  }
+}

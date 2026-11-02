@@ -1,0 +1,75 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Participant profile with basic registration and gift boxes wishlist",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "password": { "type": "string", "maxLength": 50 },
+        "giftBoxes": {
+          "type": "array",
+          "items": { "type": "string", "maxLength": 150 }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "password", "createdAt"]
+    },
+    "Room": {
+      "title": "Room",
+      "description": "A secret santa room created by an admin",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "adminPassword": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "enum": ["WAITING", "DRAWING", "FINISHED"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "adminPassword", "status", "createdAt"]
+    },
+    "Participant": {
+      "title": "Participant",
+      "description": "A person participating in the secret santa room",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "password": { "type": "string", "maxLength": 50 },
+        "giftBoxes": {
+          "type": "array",
+          "items": { "type": "string", "maxLength": 150 }
+        },
+        "wishlist": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "password", "createdAt"]
+    },
+    "Result": {
+      "title": "Draw Result",
+      "description": "The secret santa result for a specific participant",
+      "type": "object",
+      "properties": {
+        "targetId": { "type": "string" },
+        "targetName": { "type": "string" }
+      },
+      "required": ["targetId", "targetName"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Participant registered profiles and their gift boxes wishlist"
+    },
+    "rooms/{roomId}": {
+      "schema": "Room",
+      "description": "Collection of secret santa rooms"
+    },
+    "rooms/{roomId}/participants/{participantId}": {
+      "schema": "Participant",
+      "description": "Participants in a specific room"
+    },
+    "rooms/{roomId}/results/{participantId}": {
+      "schema": "Result",
+      "description": "Secret Santa results, mapped to participantId"
+    }
+  }
+}

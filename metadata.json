@@ -1,0 +1,6 @@
+{
+  "name": "Amigo Secreto Festivo",
+  "description": "App PWA para sorteio de Amigo Secreto em tempo real com efeitos festivos e anonimato total.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
