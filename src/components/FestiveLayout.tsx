@@ -67,10 +67,10 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between gap-4 md:gap-8 px-4 md:px-6 py-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+      <header className="sticky top-0 z-30 flex items-center justify-between gap-4 md:gap-8 px-4 md:px-6 py-4 bg-slate-950/95 backdrop-blur-xl border-b border-red-900/50 shadow-lg shadow-black/40">
         <div className="flex items-center gap-2">
-          <Gift className="w-6 h-6 text-red-600" />
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap shrink-0">
+          <Gift className="w-6 h-6 text-red-500" />
+          <h1 className="text-xl font-black tracking-tight text-white whitespace-nowrap shrink-0">
             Amigo Secreto
           </h1>
         </div>
