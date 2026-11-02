@@ -126,7 +126,7 @@ Um feliz fim de ano cheio de paz, amor e alegrias para toda a família! ❤️�
 
           {/* Body */}
           <div className="p-6 md:p-8 space-y-6">
-            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-xs md:text-sm text-slate-300 leading-relaxed">
               Envie este convite especial no grupo do WhatsApp da família ou redes sociais para que todos se cadastrem e montem suas listas de presentes!
             </p>
 

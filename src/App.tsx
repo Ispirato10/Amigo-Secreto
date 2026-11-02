@@ -1583,8 +1583,8 @@ export default function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold text-red-600 uppercase tracking-widest">Painel Administrativo</span>
-                  <h2 className="text-3xl font-black text-slate-900 dark:text-white">Gerenciamento de Salas</h2>
-                  <p className="text-slate-500 text-xs">Exclusivo do Administrador</p>
+                  <h2 className="text-3xl font-black text-white">Gerenciamento de Salas</h2>
+                  <p className="text-slate-300 text-xs">Exclusivo do Administrador</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -1606,13 +1606,13 @@ export default function App() {
               {!room ? (
                 <div className="space-y-8">
                   {/* Botão Criar Sala DENTRO do Acesso Adm */}
-                  <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border-2 border-dashed border-red-200 dark:border-red-900/40 text-center space-y-4">
-                    <div className="w-14 h-14 bg-red-100 dark:bg-red-950/60 text-red-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+                  <div className="bg-slate-900 p-8 rounded-3xl shadow-xl border-2 border-dashed border-red-800 text-center space-y-4">
+                    <div className="w-14 h-14 bg-red-950 text-red-400 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
                       <Plus className="w-8 h-8" />
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">Criar Nova Sala de Amigo Secreto</h3>
-                      <p className="text-slate-500 text-xs max-w-sm mx-auto">
+                      <h3 className="text-xl font-bold text-white">Criar Nova Sala de Amigo Secreto</h3>
+                      <p className="text-slate-300 text-xs max-w-sm mx-auto">
                         Inicie uma nova sala para gerar o ID de convite aos participantes.
                       </p>
                     </div>
@@ -1640,7 +1640,7 @@ export default function App() {
                         >
                           <div className="space-y-1">
                             <h4 className="font-bold text-white text-base">{r.name}</h4>
-                            <p className="text-xs text-slate-400 font-mono">ID: {r.id}</p>
+                            <p className="text-xs text-slate-300 font-mono">ID: {r.id}</p>
                             <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block ${
                               r.status === 'FINISHED' 
                                 ? 'bg-green-900 text-green-200' 
