@@ -131,18 +131,18 @@ Um feliz fim de ano cheio de paz, amor e alegrias para toda a família! ❤️�
             </p>
 
             {/* Message Box Preview */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50/70 to-red-50/70 dark:from-slate-800/80 dark:to-slate-950/80 border border-amber-200 dark:border-amber-900/40 relative space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-amber-800 dark:text-amber-300">
+            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-700 relative space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-amber-400">
                 <span className="flex items-center gap-1.5">
-                  <MessageSquare className="w-4 h-4 text-amber-600" />
+                  <MessageSquare className="w-4 h-4 text-amber-500" />
                   Mensagem de Convite
                 </span>
-                <span className="text-[10px] bg-amber-200 dark:bg-amber-900/60 px-2 py-0.5 rounded-full text-amber-900 dark:text-amber-100">
+                <span className="text-[10px] bg-amber-900 px-2 py-0.5 rounded-full text-amber-100">
                   Pronta para envio
                 </span>
               </div>
 
-              <div className="text-xs text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap max-h-40 overflow-y-auto p-3 bg-white/80 dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-slate-800 leading-relaxed">
+              <div className="text-xs text-slate-200 font-mono whitespace-pre-wrap max-h-40 overflow-y-auto p-3 bg-slate-900 rounded-xl border border-slate-700 leading-relaxed">
                 {defaultInviteMessage}
               </div>
             </div>

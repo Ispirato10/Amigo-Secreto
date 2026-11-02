@@ -1636,15 +1636,15 @@ export default function App() {
                       {allRooms.map((r, idx) => (
                         <div 
                           key={`room-${r.id || idx}`} 
-                          className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between hover:border-red-200 transition-colors group"
+                          className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex items-center justify-between hover:border-red-600 transition-colors group"
                         >
                           <div className="space-y-1">
-                            <h4 className="font-bold text-slate-900 dark:text-white text-base">{r.name}</h4>
+                            <h4 className="font-bold text-white text-base">{r.name}</h4>
                             <p className="text-xs text-slate-400 font-mono">ID: {r.id}</p>
                             <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block ${
                               r.status === 'FINISHED' 
-                                ? 'bg-green-100 text-green-700 dark:bg-green-950/60 dark:text-green-300' 
-                                : 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                                ? 'bg-green-900 text-green-200' 
+                                : 'bg-blue-900 text-blue-200'
                             }`}>
                               {r.status === 'FINISHED' ? 'Sorteio Realizado' : 'Aguardando Sorteio'}
                             </span>
