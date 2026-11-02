@@ -1434,20 +1434,20 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="max-w-md mx-auto bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800"
+              className="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-700"
             >
               <div className="mb-6 text-center space-y-2">
-                <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+                <div className="w-14 h-14 bg-slate-800 text-white rounded-2xl flex items-center justify-center mx-auto shadow-inner">
                   <Lock className="w-7 h-7" />
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white">Acesso Administrativo</h2>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
+                <h2 className="text-2xl font-black text-white">Acesso Administrativo</h2>
+                <p className="text-xs text-slate-300">
                   Painel exclusivo para administradores criarem e gerenciarem salas de sorteio.
                 </p>
               </div>
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 rounded-xl text-xs font-semibold flex items-center gap-2 border border-red-200 dark:border-red-900/50">
+                <div className="mb-4 p-3 bg-red-950/40 text-red-300 rounded-xl text-xs font-semibold flex items-center gap-2 border border-red-900/50">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -1462,7 +1462,7 @@ export default function App() {
                 );
               }} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  <label className="block text-sm font-bold text-slate-100 mb-1">
                     Usuário Admin
                   </label>
                   <input 
@@ -1470,12 +1470,12 @@ export default function App() {
                     required 
                     defaultValue="admin" 
                     placeholder="admin" 
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-950 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 font-semibold outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20" 
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-600 bg-slate-900 text-white placeholder:text-slate-400 font-semibold outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20" 
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  <label className="block text-sm font-bold text-slate-100 mb-1">
                     Senha Admin
                   </label>
                   <input 
@@ -1483,13 +1483,13 @@ export default function App() {
                     type="password" 
                     required 
                     placeholder="Digite a senha admin" 
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-950 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 font-semibold outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20" 
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-600 bg-slate-900 text-white placeholder:text-slate-400 font-semibold outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20" 
                   />
                 </div>
 
                 <button 
                   type="submit" 
-                  className="w-full py-4 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold hover:opacity-90 transition-opacity"
+                  className="w-full py-4 bg-white text-slate-950 rounded-xl font-bold hover:opacity-90 transition-opacity"
                 >
                   Entrar no Painel do Administrador
                 </button>
@@ -1497,7 +1497,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setView('HOME')} 
-                  className="w-full py-2 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold flex items-center justify-center gap-1"
+                  className="w-full py-2 text-xs text-slate-400 hover:text-white font-semibold flex items-center justify-center gap-1"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Voltar ao Início
@@ -1513,12 +1513,12 @@ export default function App() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="max-w-md mx-auto bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800"
+              className="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-700"
             >
               <div className="mb-6 space-y-1">
-                <span className="text-xs font-bold text-red-600 uppercase tracking-wider">Acesso Admin</span>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white">Criar Nova Sala</h2>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
+                <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Acesso Admin</span>
+                <h2 className="text-2xl font-black text-white">Criar Nova Sala</h2>
+                <p className="text-xs text-slate-300">
                   Crie um novo evento de amigo secreto para compartilhar o ID com os participantes.
                 </p>
               </div>
@@ -1529,26 +1529,26 @@ export default function App() {
                 handleCreateRoom(formData.get('name') as string, formData.get('password') as string);
               }} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  <label className="block text-sm font-bold text-slate-100 mb-1">
                     Nome do Evento / Sala
                   </label>
                   <input 
                     name="name" 
                     required 
                     placeholder="Ex: Família Silva 2026 ou Amigos do Trabalho" 
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-950 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 font-semibold focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none" 
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-600 bg-slate-900 text-white placeholder:text-slate-400 font-semibold focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none" 
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  <label className="block text-sm font-bold text-slate-100 mb-1">
                     Senha Opcional da Sala (Padrão: 123456)
                   </label>
                   <input 
                     name="password" 
                     type="password" 
                     defaultValue="123456" 
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-950 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 font-semibold focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none" 
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-600 bg-slate-900 text-white placeholder:text-slate-400 font-semibold focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none" 
                   />
                 </div>
 
