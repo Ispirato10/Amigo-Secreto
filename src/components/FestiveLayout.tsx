@@ -85,13 +85,13 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
             }}
             className={`p-2 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-bold ${
               isMusicPlaying
-                ? 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/60 ring-1 ring-red-400/40'
-                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800'
+                ? 'text-red-400 bg-red-950/60 ring-1 ring-red-400/40'
+                : 'text-slate-400 hover:text-slate-200 bg-slate-800'
             }`}
             title={isMusicPlaying ? "Pausar Trilha Natalina (Jingle Bells)" : "Tocar Trilha Natalina (Jingle Bells)"}
             aria-label="Alternar Música Natalina"
           >
-            <Music className={`w-4 h-4 ${isMusicPlaying ? 'animate-bounce text-red-600' : ''}`} />
+            <Music className={`w-4 h-4 ${isMusicPlaying ? 'animate-bounce text-red-500' : ''}`} />
             <span className="hidden sm:inline text-[11px]">
               {isMusicPlaying ? 'Música Tocando' : 'Música Pausada'}
             </span>
@@ -104,11 +104,11 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
               setMuted(newMuted);
               if (!newMuted) festiveAudio.playJingle();
             }}
-            className="p-2 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            className="p-2 text-slate-300 hover:text-red-400 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors"
             title={muted ? "Ativar Efeitos Sonoros Festivos" : "Silenciar Efeitos Sonoros"}
             aria-label={muted ? "Ativar Efeitos Sonoros" : "Silenciar Efeitos Sonoros"}
           >
-            {muted ? <VolumeX className="w-4 h-4 text-slate-400" /> : <Volume2 className="w-4 h-4 text-red-600" />}
+            {muted ? <VolumeX className="w-4 h-4 text-slate-400" /> : <Volume2 className="w-4 h-4 text-red-400" />}
           </button>
 
           {!isInstalled && (

@@ -893,17 +893,17 @@ export default function App() {
               className="max-w-md mx-auto bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800"
             >
               <div className="mb-6 text-center space-y-2">
-                <div className="w-14 h-14 bg-red-100 dark:bg-red-950/60 text-red-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+                <div className="w-14 h-14 bg-red-950 text-red-400 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
                   <UserPlus className="w-7 h-7" />
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white">Cadastro do Participante</h2>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
+                <h2 className="text-2xl font-black text-white">Cadastro do Participante</h2>
+                <p className="text-xs text-slate-300">
                   Preencha apenas seu nome e uma senha. Logo em seguida você configurará suas caixas de presentes!
                 </p>
               </div>
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 rounded-xl text-xs font-semibold flex items-center gap-2 border border-red-200 dark:border-red-900/50">
+                <div className="mb-4 p-3 bg-red-950/40 text-red-300 rounded-xl text-xs font-semibold flex items-center gap-2 border border-red-900/50">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -918,19 +918,19 @@ export default function App() {
                 );
               }} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  <label className="block text-sm font-bold text-slate-100 mb-1">
                     Seu Nome
                   </label>
                   <input 
                     name="name" 
                     required 
                     placeholder="Ex: Maria Clara Silva" 
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-950 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 font-semibold focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none" 
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-600 bg-slate-900 text-white placeholder:text-slate-400 font-semibold focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none" 
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  <label className="block text-sm font-bold text-slate-100 mb-1">
                     Senha de Acesso
                   </label>
                   <input 
@@ -938,9 +938,9 @@ export default function App() {
                     type="password" 
                     required 
                     placeholder="Digite uma senha simples" 
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-950 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 font-semibold focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none" 
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-600 bg-slate-900 text-white placeholder:text-slate-400 font-semibold focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none" 
                   />
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  <p className="text-[11px] text-slate-400 mt-1">
                     Guarde essa senha para acessar seu perfil e conferir seu sorteio.
                   </p>
                 </div>
