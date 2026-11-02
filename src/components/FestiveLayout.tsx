@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { Download, Info, Gift, Volume2, VolumeX } from 'lucide-react';
 import { festiveAudio } from '../lib/festiveAudio';
+import festiveHeroBg from '../assets/images/festive_secret_santa_hero_1793629619164.jpg';
 
 interface FestiveLayoutProps {
   children: React.ReactNode;
@@ -28,7 +29,7 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
       {/* Background festive image with overlay */}
       <div className="fixed inset-0 z-0">
         <img 
-          src="/src/assets/images/festive_secret_santa_hero_1793629619164.jpg" 
+          src={festiveHeroBg || '/assets/images/festive_secret_santa_hero_1793629619164.jpg'} 
           alt="Festive background"
           className="w-full h-full object-cover opacity-10 dark:opacity-20"
         />

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { festiveAudio } from '../lib/festiveAudio';
 import confetti from 'canvas-confetti';
+import familyShareCardImg from '../assets/images/family_share_card_1793635609269.jpg';
 
 interface FestiveFamilyInviteModalProps {
   isOpen: boolean;
@@ -106,7 +107,7 @@ Um feliz fim de ano cheio de paz, amor e alegrias para toda a família! ❤️�
           {/* Social Share Banner Header */}
           <div className="relative aspect-video w-full overflow-hidden bg-slate-950">
             <img 
-              src="/src/assets/images/family_share_card_1793635609269.jpg" 
+              src={familyShareCardImg || '/assets/images/family_share_card_1793635609269.jpg'} 
               alt="Convite Amigo Secreto da Família"
               className="w-full h-full object-cover"
             />

@@ -11,7 +11,7 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
+        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'assets/images/*'],
         manifest: {
           name: 'Amigo Secreto Festivo',
           short_name: 'AmigoSecreto',
@@ -21,13 +21,13 @@ export default defineConfig(() => {
           display: 'standalone',
           icons: [
             {
-              src: '/src/assets/images/pwa_app_icon_1793635609788.jpg',
+              src: '/assets/images/pwa_app_icon_1793635609788.jpg',
               sizes: '512x512',
               type: 'image/jpeg',
               purpose: 'any'
             },
             {
-              src: '/src/assets/images/pwa_app_icon_1793635609788.jpg',
+              src: '/assets/images/pwa_app_icon_1793635609788.jpg',
               sizes: '512x512',
               type: 'image/jpeg',
               purpose: 'maskable'
