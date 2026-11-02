@@ -55,13 +55,15 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
               delay: p.delay,
               ease: "linear"
             }}
-            className="absolute rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.95)]"
+            className="absolute text-white pointer-events-none select-none"
             style={{ 
-              left: p.left, 
-              width: p.size, 
-              height: p.size
+              left: p.left,
+              fontSize: `${p.size * 3}px`,
+              textShadow: '0 0 6px rgba(255,255,255,0.9)'
             }}
-          />
+          >
+            ❄
+          </motion.div>
         ))}
       </div>
 
