@@ -64,7 +64,7 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between gap-8 px-6 py-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+      <header className="sticky top-0 z-30 flex items-center justify-between gap-4 md:gap-8 px-4 md:px-6 py-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <Gift className="w-6 h-6 text-red-600" />
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap shrink-0">
@@ -72,7 +72,7 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
           </h1>
         </div>
 
-        <nav className="flex items-center gap-3">
+        <nav className="flex items-center gap-2 md:gap-3">
           <button
             onClick={() => {
               const newMuted = festiveAudio.toggleMute();

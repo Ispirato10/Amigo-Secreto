@@ -21,13 +21,13 @@ export default defineConfig(() => {
           display: 'standalone',
           icons: [
             {
-              src: '/src/assets/images/secret_santa_app_icon_1793629619978.jpg',
+              src: '/src/assets/images/pwa_app_icon_1793635609788.jpg',
               sizes: '512x512',
               type: 'image/jpeg',
               purpose: 'any'
             },
             {
-              src: '/src/assets/images/secret_santa_app_icon_1793629619978.jpg',
+              src: '/src/assets/images/pwa_app_icon_1793635609788.jpg',
               sizes: '512x512',
               type: 'image/jpeg',
               purpose: 'maskable'

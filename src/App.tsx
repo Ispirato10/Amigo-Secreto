@@ -35,7 +35,8 @@ import {
   Sparkles,
   ArrowLeft,
   Package,
-  Edit3
+  Edit3,
+  Share2
 } from 'lucide-react';
 import { festiveAudio } from './lib/festiveAudio';
 import { FestiveWaitingHero } from './components/FestiveWaitingHero';
@@ -43,6 +44,7 @@ import { FestiveWaitingList } from './components/FestiveWaitingList';
 import { FestiveGiftSavedModal } from './components/FestiveGiftSavedModal';
 import { AdminParticipantManager } from './components/AdminParticipantManager';
 import { FestiveRevealExperience } from './components/FestiveRevealExperience';
+import { FestiveFamilyInviteModal } from './components/FestiveFamilyInviteModal';
 import confetti from 'canvas-confetti';
 
 // --- Types ---
@@ -101,6 +103,7 @@ export default function App() {
   const [roomToDelete, setRoomToDelete] = useState<{ id: string; name: string } | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showGiftSavedModal, setShowGiftSavedModal] = useState<boolean>(false);
+  const [showFamilyInviteModal, setShowFamilyInviteModal] = useState<boolean>(false);
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -573,6 +576,9 @@ export default function App() {
         name: 'Administrador Geral' 
       }));
       setView('ADMIN');
+      setShowFamilyInviteModal(true);
+      festiveAudio.playRegistrationSuccess();
+      setSuccessMessage("🎉 Sala criada com sucesso! Divulgue o código da sala para os participantes pelo botão WhatsApp abaixo.");
     } catch (err) {
       handleFirestoreError(err, OperationType.CREATE, 'rooms');
     } finally {
@@ -1667,29 +1673,66 @@ export default function App() {
                     onErrorMessage={(msg) => setError(msg)}
                   />
 
-                  {/* Convite & Link da Sala */}
-                  <div className="bg-red-50 dark:bg-red-950/30 p-6 rounded-3xl border border-red-100 dark:border-red-900/30 space-y-3">
-                    <h3 className="font-bold text-red-900 dark:text-red-400 flex items-center gap-2">
-                      <Clipboard className="w-5 h-5" />
-                      Código e Link de Convite da Sala
-                    </h3>
-                    <p className="text-xs text-red-700 dark:text-red-300">
-                      Compartilhe o ID abaixo com os participantes para que eles entrem na sala:
-                    </p>
-                    <div className="flex gap-2">
-                      <code className="flex-1 p-3 bg-white dark:bg-slate-900 rounded-xl font-mono text-center text-red-600 font-black border border-red-200 dark:border-red-800 break-all text-xs flex items-center justify-center">
-                        {room.id}
-                      </code>
+                  {/* Convite & Compartilhamento da Chave da Sala pelo ADM */}
+                  <div className="bg-gradient-to-br from-red-50 via-amber-50 to-red-50 dark:from-red-950/40 dark:via-slate-900 dark:to-red-950/40 p-6 rounded-3xl border-2 border-red-200 dark:border-red-900/40 space-y-4 shadow-lg shadow-red-500/5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-red-200/60 dark:border-red-900/40 pb-3">
+                      <div>
+                        <h3 className="font-black text-red-900 dark:text-red-300 text-lg flex items-center gap-2">
+                          <Share2 className="w-5 h-5 text-red-600" />
+                          Compartilhar Chave da Sala via WhatsApp
+                        </h3>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                          Envie a chave da sala e o link direto para os participantes entrarem!
+                        </p>
+                      </div>
+                      <span className="px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 text-[10px] font-black uppercase tracking-wider rounded-full self-start sm:self-auto">
+                        Link Oficial Vercel
+                      </span>
+                    </div>
+
+                    {/* Room ID display & copy */}
+                    <div className="flex flex-col sm:flex-row items-stretch gap-3">
+                      <div className="flex-1 p-3 bg-white dark:bg-slate-900 rounded-2xl font-mono text-center text-red-600 font-black border-2 border-red-200 dark:border-red-800 text-sm flex items-center justify-center gap-2 shadow-inner">
+                        <span className="text-xs font-bold text-slate-400 font-sans uppercase">Chave:</span>
+                        <span>{room.id}</span>
+                      </div>
+
                       <button 
                         onClick={() => {
-                          const url = `${window.location.origin}?room=${room.id}`;
+                          const url = `https://meuamigofamily.vercel.app?room=${room.id}`;
                           navigator.clipboard.writeText(url);
-                          setSuccessMessage("Link de convite copiado para a área de transferência!");
+                          setSuccessMessage("Link da sala (meuamigofamily.vercel.app) copiado para a área de transferência!");
+                          festiveAudio.playJingle();
                         }}
-                        className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-xl shrink-0 transition-colors"
-                        title="Copiar Link de Convite"
+                        className="px-4 py-3 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                        title="Copiar Link direto da Sala"
                       >
-                        <Clipboard className="w-5 h-5" />
+                        <Clipboard className="w-4 h-4 text-red-600" />
+                        <span>Copiar Link</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          const baseUrl = 'https://meuamigofamily.vercel.app';
+                          const shareUrl = `${baseUrl}?room=${room.id}`;
+                          const msg = `🎄✨ *AMIGO SECRETO DA FAMÍLIA DE FIM DE ANO!* 🎅🎁\n\nBoas Festas, pessoal! O nosso sorteio da sala *${room.name}* já está pronto! 🌟\n\n🔑 *CHAVE DA SALA:* *${room.id}*\n👉 *ENTRE DIRETO PELO LINK:* ${shareUrl}\n\nCadastre seu nome e suas caixas de presente! Bom sorteio a todos! ❤️🎅✨`;
+                          const encoded = encodeURIComponent(msg);
+                          window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+                        }}
+                        className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-xs shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        <span>Enviar Chave no WhatsApp</span>
+                      </button>
+                    </div>
+
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between pt-1">
+                      <span>Link gerado: <strong className="text-red-600">https://meuamigofamily.vercel.app?room={room.id}</strong></span>
+                      <button
+                        onClick={() => setShowFamilyInviteModal(true)}
+                        className="text-red-600 hover:underline font-bold"
+                      >
+                        Ver Cartão de Convite Completo
                       </button>
                     </div>
                   </div>
@@ -1904,6 +1947,14 @@ export default function App() {
         giftBoxes={giftBoxes}
         roomName={room?.name}
         onGoToRoom={() => setView('DASHBOARD')}
+      />
+
+      {/* Festive Family Invite Modal */}
+      <FestiveFamilyInviteModal
+        isOpen={showFamilyInviteModal}
+        onClose={() => setShowFamilyInviteModal(false)}
+        roomId={room?.id}
+        roomName={room?.name}
       />
     </FestiveLayout>
 
