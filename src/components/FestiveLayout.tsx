@@ -18,36 +18,36 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
 
   // Generate snow particles
   const snowParticles = React.useMemo(() => 
-    Array.from({ length: 30 }).map((_, i) => ({
+    Array.from({ length: 50 }).map((_, i) => ({
       id: `snow-flake-${i}`,
       left: `${Math.random() * 100}%`,
-      duration: 5 + Math.random() * 10,
-      delay: Math.random() * 5,
-      size: 2 + Math.random() * 4
+      duration: 4 + Math.random() * 8,
+      delay: Math.random() * 6,
+      size: 3 + Math.random() * 4
     })), []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-red-500 selection:text-white relative overflow-hidden">
       {/* Background festive image with rich overlay */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <img 
           src={festiveHeroBg || '/assets/images/festive_secret_santa_hero_1793629619164.jpg'} 
           alt="Festive background"
-          className="w-full h-full object-cover opacity-35 filter brightness-90"
+          className="w-full h-full object-cover opacity-25 filter brightness-90"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/60 to-slate-950/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-950/70 to-slate-950/90" />
       </div>
 
       {/* Snowfall effect */}
-      <div className="fixed inset-0 pointer-events-none z-10 overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-15 overflow-hidden">
         {snowParticles.map((p) => (
           <motion.div
             key={p.id}
             initial={{ y: -20, opacity: 0 }}
             animate={{ 
               y: '110vh', 
-              opacity: [0, 0.8, 0],
-              x: ['-5vw', '5vw', '-5vw']
+              opacity: [0, 0.95, 0],
+              x: ['-6vw', '6vw', '-6vw']
             }}
             transition={{ 
               duration: p.duration, 
@@ -55,12 +55,11 @@ export const FestiveLayout: React.FC<FestiveLayoutProps> = ({ children }) => {
               delay: p.delay,
               ease: "linear"
             }}
-            className="absolute rounded-full bg-white dark:bg-slate-200"
+            className="absolute rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.95)]"
             style={{ 
               left: p.left, 
               width: p.size, 
-              height: p.size,
-              filter: 'blur(1px)'
+              height: p.size
             }}
           />
         ))}

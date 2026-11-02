@@ -9,4 +9,22 @@
     color: #f8fafc; /* slate-50 */
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Bulletproof high-contrast dark mode overrides for mobile & all browsers */
+  .bg-white {
+    background-color: #0f172a !important; /* slate-900 */
+    color: #ffffff !important;
+  }
+  .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600 {
+    color: #f1f5f9 !important; /* slate-100 */
+  }
+  .text-slate-500, .text-slate-400 {
+    color: #cbd5e1 !important; /* slate-300 */
+  }
+  .bg-slate-50 {
+    background-color: #1e293b !important; /* slate-800 */
+  }
+  .border-slate-100, .border-slate-200, .border-slate-300, .border-slate-400 {
+    border-color: #334155 !important; /* slate-700 */
+  }
 }
