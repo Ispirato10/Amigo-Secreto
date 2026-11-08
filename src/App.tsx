@@ -68,6 +68,7 @@ interface Participant {
   giftBoxes?: string[];
   wishlist?: string;
   uid?: string;
+  familyGroup?: string;
 }
 
 interface UserProfile {
@@ -611,14 +612,24 @@ export default function App() {
       let shuffled = [...participants];
       let isValid = false;
       let attempts = 0;
+      const maxAttempts = 300;
 
-      while (!isValid && attempts < 100) {
+      while (!isValid && attempts < maxAttempts) {
         shuffled = shuffled.sort(() => Math.random() - 0.5);
-        isValid = participants.every((p, i) => p.id !== shuffled[i].id);
+        isValid = participants.every((p, i) => {
+          const target = shuffled[i];
+          const isSelf = p.id === target.id;
+          const pFam = (p.familyGroup || '').trim().toLowerCase();
+          const targetFam = (target.familyGroup || '').trim().toLowerCase();
+          const isSameFamily = pFam !== '' && targetFam !== '' && pFam === targetFam;
+          return !isSelf && !isSameFamily;
+        });
         attempts++;
       }
 
-      if (!isValid) throw new Error("Falha ao gerar sorteio. Tente novamente.");
+      if (!isValid) {
+        throw new Error("Não foi possível gerar um sorteio com as restrições de família atuais. Verifique se algum grupo familiar tem mais integrantes do que a metade da sala.");
+      }
 
       const promises = participants.map((p, i) => {
         const target = shuffled[i];

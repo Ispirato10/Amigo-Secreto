@@ -34,6 +34,7 @@ export interface Participant {
   giftBoxes?: string[];
   wishlist?: string;
   uid?: string;
+  familyGroup?: string;
 }
 
 interface AdminParticipantManagerProps {
@@ -57,6 +58,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
   const [editingParticipant, setEditingParticipant] = useState<Participant | null>(null);
   const [editName, setEditName] = useState('');
   const [editGiftBoxes, setEditGiftBoxes] = useState<string[]>(['', '', '']);
+  const [editFamilyGroup, setEditFamilyGroup] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Delete modal state
@@ -68,12 +70,59 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
   const [newName, setNewName] = useState('');
   const [newPassword, setNewPassword] = useState('1234');
   const [newGiftBoxes, setNewGiftBoxes] = useState<string[]>(['', '', '']);
+  const [newFamilyGroup, setNewFamilyGroup] = useState('');
   const [isSavingNew, setIsSavingNew] = useState(false);
+
+  // Unique family groups for suggestions
+  const existingFamilies = Array.from(new Set(participants.map(p => p.familyGroup).filter(Boolean))) as string[];
+
+  // Quick inline family assignment on card
+  const [quickEditingParticipantId, setQuickEditingParticipantId] = useState<string | null>(null);
+  const [quickFamilyInput, setQuickFamilyInput] = useState<string>('');
+
+  const handleQuickChangeFamily = async (p: Participant, selectedValue: string) => {
+    if (selectedValue === '__NEW__') {
+      setQuickEditingParticipantId(p.id);
+      setQuickFamilyInput('');
+      return;
+    }
+
+    try {
+      const targetFamily = selectedValue.trim();
+      const partRef = doc(db, `rooms/${roomId}/participants`, p.id);
+      await updateDoc(partRef, { familyGroup: targetFamily });
+      
+      try {
+        await updateDoc(doc(db, 'users', p.id), { familyGroup: targetFamily });
+      } catch {}
+
+      if (targetFamily) {
+        onSuccessMessage(`Grupo familiar de "${p.name}" alterado para "${targetFamily}".`);
+      } else {
+        onSuccessMessage(`Grupo familiar de "${p.name}" removido.`);
+      }
+    } catch (err) {
+      console.error("Erro ao atualizar grupo familiar:", err);
+      onErrorMessage("Erro ao atualizar grupo familiar.");
+    }
+  };
+
+  const handleSaveQuickCustomFamily = async (p: Participant) => {
+    if (!quickFamilyInput.trim()) {
+      setQuickEditingParticipantId(null);
+      return;
+    }
+    const val = quickFamilyInput.trim();
+    setQuickEditingParticipantId(null);
+    setQuickFamilyInput('');
+    await handleQuickChangeFamily(p, val);
+  };
 
   // Start editing participant
   const handleOpenEdit = (p: Participant) => {
     setEditingParticipant(p);
     setEditName(p.name);
+    setEditFamilyGroup(p.familyGroup || '');
     const boxes = Array.isArray(p.giftBoxes) && p.giftBoxes.length > 0 
       ? [...p.giftBoxes] 
       : (p.wishlist ? p.wishlist.split(',').map(s => s.trim()) : ['', '', '']);
@@ -97,7 +146,8 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
       await updateDoc(partRef, {
         name: editName.trim(),
         giftBoxes: editGiftBoxes,
-        wishlist: formattedWishlist
+        wishlist: formattedWishlist,
+        familyGroup: editFamilyGroup.trim()
       });
 
       // Also attempt updating user doc if exists
@@ -105,7 +155,8 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
         const userRef = doc(db, 'users', editingParticipant.id);
         await updateDoc(userRef, {
           name: editName.trim(),
-          giftBoxes: editGiftBoxes
+          giftBoxes: editGiftBoxes,
+          familyGroup: editFamilyGroup.trim()
         });
       } catch {
         // Ignore if user doc ID doesn't directly match
@@ -168,6 +219,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
         name: newName.trim(),
         password: newPassword.trim() || '1234',
         giftBoxes: newGiftBoxes,
+        familyGroup: newFamilyGroup.trim(),
         createdAt: serverTimestamp()
       });
 
@@ -179,6 +231,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
         password: newPassword.trim() || '1234',
         giftBoxes: newGiftBoxes,
         wishlist: formattedWishlist,
+        familyGroup: newFamilyGroup.trim(),
         createdAt: serverTimestamp()
       });
 
@@ -188,6 +241,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
       setNewName('');
       setNewPassword('1234');
       setNewGiftBoxes(['', '', '']);
+      setNewFamilyGroup('');
     } catch (err) {
       console.error("Erro ao adicionar participante:", err);
       onErrorMessage("Erro ao adicionar novo participante.");
@@ -214,7 +268,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
             Gerenciar Participantes
           </h3>
           <p className="text-xs text-slate-400">
-            Edite nomes, altere caixas de presentes ou remova participantes.
+            Edite dados, altere caixas de presentes, atribua restrição de família diretamente nos cards ou remova participantes.
           </p>
         </div>
 
@@ -257,13 +311,74 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
               className="p-4 bg-slate-800 rounded-2xl border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-red-600 transition-all group"
             >
               <div className="space-y-1.5 min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-red-900 text-red-200 text-xs font-black flex items-center justify-center">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-red-900 text-red-200 text-xs font-black flex items-center justify-center shrink-0">
                     {index + 1}
                   </span>
                   <h4 className="font-black text-white text-base truncate">
                     {p.name}
                   </h4>
+
+                  {/* INLINE QUICK FAMILY GROUP SELECTOR RIGHT ON CARD */}
+                  {quickEditingParticipantId === p.id ? (
+                    <div className="inline-flex items-center gap-1.5 bg-slate-900 border-2 border-purple-600 rounded-xl px-2 py-1 shadow-lg">
+                      <Users className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                      <input
+                        type="text"
+                        autoFocus
+                        value={quickFamilyInput}
+                        onChange={(e) => setQuickFamilyInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleSaveQuickCustomFamily(p);
+                          if (e.key === 'Escape') setQuickEditingParticipantId(null);
+                        }}
+                        placeholder="Nome da família..."
+                        className="bg-transparent text-white font-bold text-xs outline-none w-28 sm:w-36"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleSaveQuickCustomFamily(p)}
+                        className="p-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors cursor-pointer"
+                        title="Salvar Família"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setQuickEditingParticipantId(null)}
+                        className="p-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors cursor-pointer"
+                        title="Cancelar"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-bold border transition-all ${
+                      p.familyGroup 
+                        ? 'bg-purple-950/90 border-purple-700 text-purple-300 shadow-xs hover:border-purple-500' 
+                        : 'bg-slate-900/90 border-slate-700 text-slate-400 hover:border-purple-600 hover:text-purple-300'
+                    }`}>
+                      <Users className={`w-3.5 h-3.5 ${p.familyGroup ? 'text-purple-400' : 'text-slate-500'}`} />
+                      <select
+                        value={p.familyGroup || ''}
+                        onChange={(e) => handleQuickChangeFamily(p, e.target.value)}
+                        className="bg-transparent text-purple-200 font-bold text-xs outline-none cursor-pointer pr-1"
+                        title="Alterar Grupo Familiar diretamente no card"
+                      >
+                        <option value="" className="bg-slate-900 text-slate-300">
+                          {p.familyGroup ? '❌ Remover Família' : '👥 Sem Família (Definir...)'}
+                        </option>
+                        {existingFamilies.map(fam => (
+                          <option key={`fam-opt-${fam}`} value={fam} className="bg-slate-900 text-purple-300">
+                            Família: {fam}
+                          </option>
+                        ))}
+                        <option value="__NEW__" className="bg-slate-900 text-amber-400 font-bold">
+                          ➕ Criar Novo Grupo...
+                        </option>
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 {/* Gift Boxes Preview */}
@@ -361,16 +476,51 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
                     Nome do Participante
                   </label>
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-950 dark:text-white font-bold text-sm focus:border-red-600 outline-none"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-700 bg-slate-900 text-white font-bold text-sm focus:border-red-600 outline-none"
                     placeholder="Nome completo"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Users className="w-4 h-4 text-purple-400" />
+                      Grupo Familiar / Restrição de Sorteio
+                    </span>
+                    <span className="text-[10px] text-purple-400 font-normal">Evita sorteio interno</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editFamilyGroup}
+                    onChange={(e) => setEditFamilyGroup(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-700 bg-slate-900 text-white font-bold text-sm focus:border-purple-500 outline-none"
+                    placeholder="Ex: Família Silva ou Grupo A"
+                  />
+                  {existingFamilies.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+                      <span className="text-[10px] text-slate-400 font-semibold">Grupos na sala:</span>
+                      {existingFamilies.map(f => (
+                        <button
+                          key={`edit-fam-tag-${f}`}
+                          type="button"
+                          onClick={() => setEditFamilyGroup(f)}
+                          className="px-2 py-0.5 rounded-md bg-purple-950/60 hover:bg-purple-900 text-purple-300 border border-purple-800 text-[10px] font-bold transition-colors"
+                        >
+                          {f}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Integrantes marcados com o mesmo Grupo Familiar NÃO serão sorteados entre si.
+                  </p>
                 </div>
 
                 <div className="space-y-3 pt-2">
@@ -495,7 +645,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
                     Senha de Acesso do Participante
                   </label>
                   <input
@@ -503,10 +653,45 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Senha para ele logar (ex: 1234)"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-950 dark:text-white font-bold text-sm focus:border-red-600 outline-none"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-700 bg-slate-900 text-white font-bold text-sm focus:border-red-600 outline-none"
                   />
                   <p className="text-[11px] text-slate-400 mt-1">
                     O participante utilizará essa senha para acessar seu perfil e conferir o sorteio.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Users className="w-4 h-4 text-purple-400" />
+                      Grupo Familiar / Restrição de Sorteio
+                    </span>
+                    <span className="text-[10px] text-purple-400 font-normal">Evita sorteio interno</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newFamilyGroup}
+                    onChange={(e) => setNewFamilyGroup(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-700 bg-slate-900 text-white font-bold text-sm focus:border-purple-500 outline-none"
+                    placeholder="Ex: Família Silva, Núcleo A, etc."
+                  />
+                  {existingFamilies.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+                      <span className="text-[10px] text-slate-400 font-semibold">Grupos existentes:</span>
+                      {existingFamilies.map(f => (
+                        <button
+                          key={`new-fam-tag-${f}`}
+                          type="button"
+                          onClick={() => setNewFamilyGroup(f)}
+                          className="px-2 py-0.5 rounded-md bg-purple-950/60 hover:bg-purple-900 text-purple-300 border border-purple-800 text-[10px] font-bold transition-colors"
+                        >
+                          {f}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Pessoas com o mesmo grupo não serão sorteadas entre si no amigo secreto.
                   </p>
                 </div>
 

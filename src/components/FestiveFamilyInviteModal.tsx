@@ -88,93 +88,108 @@ Um feliz fim de ano cheio de paz, amor e alegrias para toda a família! ❤️�
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="relative w-full max-w-sm bg-slate-900 rounded-3xl shadow-2xl border border-slate-700 overflow-hidden my-auto mx-auto"
+          className="relative w-full max-w-md bg-slate-900 rounded-3xl shadow-2xl border border-slate-700 overflow-hidden my-auto mx-auto"
         >
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 z-20 p-2 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full backdrop-blur-md transition-colors"
+            className="absolute top-3 right-3 z-20 p-2 bg-slate-900/80 hover:bg-slate-800 text-white rounded-full backdrop-blur-md transition-colors border border-slate-700"
             title="Fechar"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
 
-          {/* Social Share Banner Header - Extremely compact */}
-          <div className="relative h-20 w-full overflow-hidden bg-slate-950 shrink-0">
+          {/* Social Share Banner Header */}
+          <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-slate-950 shrink-0">
             <img 
               src={familyShareCardImg} 
               alt="Convite Amigo Secreto"
               className="w-full h-full object-cover opacity-60"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent flex items-end p-3">
-              <div className="space-y-0.5">
-                <span className="px-2 py-0.5 bg-red-600 text-white font-black text-[8px] uppercase tracking-widest rounded-full inline-flex items-center gap-1 shadow-md">
-                  <Sparkles className="w-2.5 h-2.5" />
-                  Convite
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent flex items-end p-5">
+              <div className="space-y-1">
+                <span className="px-3 py-1 bg-red-600 text-white font-black text-xs uppercase tracking-widest rounded-full inline-flex items-center gap-1.5 shadow-lg">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Convite Festivo
                 </span>
-                <h2 className="text-base font-black text-white leading-tight">
+                <h2 className="text-xl sm:text-2xl font-black text-white leading-tight drop-shadow-md">
                   Convidar a Família 🎄
                 </h2>
               </div>
             </div>
           </div>
 
-          {/* Body - Minimal padding and spacing */}
-          <div className="p-3 space-y-3">
-            <p className="text-[10px] text-slate-300 leading-tight text-center">
-              Compartilhe no WhatsApp para todos participarem!
+          {/* Body */}
+          <div className="p-5 sm:p-6 space-y-4">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed text-center font-medium">
+              Envie o convite no grupo da família para que todos se cadastrem e entrem no sorteio!
             </p>
 
-            {/* Message Box Preview - Shorter */}
-            <div className="p-2 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-              <div className="flex items-center justify-between text-[8px] font-bold text-amber-500/80 px-1">
-                <span className="flex items-center gap-1">
-                  <MessageSquare className="w-2.5 h-2.5" />
-                  MENSAGEM
+            {/* Message Box Preview */}
+            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-amber-400 px-1">
+                <span className="flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  PRÉVIA DA MENSAGEM
                 </span>
-                <span className="bg-amber-900/30 px-1.5 py-0.5 rounded-full text-amber-200/70 uppercase">Pronta</span>
+                <span className="bg-amber-950/80 text-amber-300 border border-amber-800/60 px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider">
+                  Pronta para envio
+                </span>
               </div>
-              <div className="text-[10px] text-slate-400 font-mono whitespace-pre-wrap max-h-16 overflow-y-auto p-2 bg-slate-900/30 rounded-lg leading-tight border border-slate-800/50">
+              <div className="text-xs font-mono text-slate-300 whitespace-pre-wrap max-h-36 overflow-y-auto p-3 bg-slate-900/50 rounded-xl leading-relaxed border border-slate-800/80">
                 {defaultInviteMessage}
               </div>
             </div>
 
-            {/* Action Buttons - SMALL CIRCLES IN ONE ROW */}
-            <div className="flex items-center justify-center gap-3 py-1">
-              <button
-                onClick={handleWhatsAppShare}
-                className="w-10 h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg shadow-emerald-950/40 transition-all flex items-center justify-center shrink-0 active:scale-90"
-                title="WhatsApp"
-              >
-                <Send className="w-4.5 h-4.5" />
-              </button>
+            {/* Action Buttons - SINGLE ROW CIRCULAR ICON-ONLY BUTTONS */}
+            <div className="pt-2 flex flex-col items-center gap-2">
+              <div className="flex items-center justify-center gap-5">
+                <div className="flex flex-col items-center gap-1">
+                  <button
+                    onClick={handleWhatsAppShare}
+                    className="w-12 h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-xl shadow-emerald-950/60 transition-all flex items-center justify-center shrink-0 active:scale-95 cursor-pointer"
+                    title="Enviar via WhatsApp"
+                  >
+                    <Send className="w-5.5 h-5.5" />
+                  </button>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">WhatsApp</span>
+                </div>
 
-              <button
-                onClick={handleCopyMessage}
-                className={`w-10 h-10 rounded-full shadow-lg transition-all flex items-center justify-center shrink-0 active:scale-90 ${
-                  copied 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-red-600 hover:bg-red-700 text-white shadow-red-950/40'
-                }`}
-                title="Copiar"
-              >
-                {copied ? <Check className="w-4.5 h-4.5" /> : <Copy className="w-4.5 h-4.5" />}
-              </button>
+                <div className="flex flex-col items-center gap-1">
+                  <button
+                    onClick={handleCopyMessage}
+                    className={`w-12 h-12 rounded-full shadow-xl transition-all flex items-center justify-center shrink-0 active:scale-95 cursor-pointer ${
+                      copied 
+                        ? 'bg-emerald-600 text-white shadow-emerald-950/60' 
+                        : 'bg-red-600 hover:bg-red-500 text-white shadow-red-950/60'
+                    }`}
+                    title={copied ? "Copiado!" : "Copiar Texto"}
+                  >
+                    {copied ? <Check className="w-5.5 h-5.5" /> : <Copy className="w-5.5 h-5.5" />}
+                  </button>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    {copied ? 'Copiado!' : 'Copiar'}
+                  </span>
+                </div>
 
-              {'share' in navigator && (
-                <button
-                  onClick={handleWebShare}
-                  className="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-full shadow-lg transition-all flex items-center justify-center shrink-0 active:scale-90 border border-slate-700"
-                  title="Mais"
-                >
-                  <Share2 className="w-4.5 h-4.5 text-amber-500" />
-                </button>
-              )}
+                {'share' in navigator && (
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={handleWebShare}
+                      className="w-12 h-12 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-full shadow-xl transition-all flex items-center justify-center shrink-0 active:scale-95 border border-slate-700 cursor-pointer"
+                      title="Compartilhar no Aparelho"
+                    >
+                      <Share2 className="w-5.5 h-5.5" />
+                    </button>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Outros</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </motion.div>
