@@ -29,7 +29,7 @@ service cloud.firestore {
       );
       
       allow update: if (
-        incoming().diff(existing()).affectedKeys().hasOnly(['giftBoxes', 'name', 'password', 'updatedAt'])
+        incoming().diff(existing()).affectedKeys().hasOnly(['giftBoxes', 'name', 'password', 'updatedAt', 'familyGroup'])
       );
 
       allow delete: if true;

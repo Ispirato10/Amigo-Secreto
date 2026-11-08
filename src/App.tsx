@@ -45,6 +45,7 @@ import { FestiveWaitingHero } from './components/FestiveWaitingHero';
 import { FestiveWaitingList } from './components/FestiveWaitingList';
 import { FestiveGiftSavedModal } from './components/FestiveGiftSavedModal';
 import { AdminParticipantManager } from './components/AdminParticipantManager';
+import { AdminUsersDirectory } from './components/AdminUsersDirectory';
 import { FestiveRevealExperience } from './components/FestiveRevealExperience';
 import { FestiveFamilyInviteModal } from './components/FestiveFamilyInviteModal';
 import { FestiveResetRoomModal } from './components/FestiveResetRoomModal';
@@ -76,6 +77,8 @@ interface UserProfile {
   name: string;
   password?: string;
   giftBoxes: string[];
+  familyGroup?: string;
+  createdAt?: any;
 }
 
 interface DrawResult {
@@ -112,6 +115,8 @@ export default function App() {
   const [showFamilyInviteModal, setShowFamilyInviteModal] = useState<boolean>(false);
   const [roomToReset, setRoomToReset] = useState<{ id: string; name: string } | null>(null);
   const [showDrawCountdown, setShowDrawCountdown] = useState<boolean>(false);
+  const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
+  const [adminTab, setAdminTab] = useState<'ROOMS' | 'USERS'>('ROOMS');
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -176,6 +181,21 @@ export default function App() {
         setAllRooms(roomsList);
       }, (err) => {
         console.error("Erro ao listar salas:", err);
+      });
+      return unsubscribe;
+    }
+  }, [view, user?.role]);
+
+  // Listen to all registered users in the app ONLY when logged in as ADMIN
+  useEffect(() => {
+    if (view === 'ADMIN' && user?.role === 'ADMIN') {
+      const q = collection(db, 'users');
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const usersList = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as UserProfile));
+        usersList.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        setAllUsers(usersList);
+      }, (err) => {
+        console.error("Erro ao listar usuários cadastrados no app:", err);
       });
       return unsubscribe;
     }
@@ -1594,7 +1614,9 @@ export default function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold text-red-600 uppercase tracking-widest">Painel Administrativo</span>
-                  <h2 className="text-3xl font-black text-white">Gerenciamento de Salas</h2>
+                  <h2 className="text-3xl font-black text-white">
+                    {adminTab === 'USERS' && !room ? 'Diretório de Participantes' : 'Gerenciamento Geral'}
+                  </h2>
                   <p className="text-slate-300 text-xs">Exclusivo do Administrador</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1614,96 +1636,153 @@ export default function App() {
                 </div>
               </div>
 
+              {/* Navigation Tabs for Admin outside of a room */}
+              {!room && (
+                <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+                  <button
+                    onClick={() => setAdminTab('ROOMS')}
+                    className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 cursor-pointer ${
+                      adminTab === 'ROOMS'
+                        ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                        : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+                    }`}
+                  >
+                    <Gift className="w-4 h-4" />
+                    <span>Salas de Sorteio ({allRooms.length})</span>
+                  </button>
+
+                  <button
+                    onClick={() => setAdminTab('USERS')}
+                    className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 cursor-pointer ${
+                      adminTab === 'USERS'
+                        ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                        : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+                    }`}
+                  >
+                    <Users className="w-4 h-4" />
+                    <span>Pessoas Cadastradas no App ({allUsers.length})</span>
+                  </button>
+                </div>
+              )}
+
               {!room ? (
-                <div className="space-y-8">
-                  {/* Botão Criar Sala DENTRO do Acesso Adm */}
-                  <div className="bg-slate-900 p-8 rounded-3xl shadow-xl border-2 border-dashed border-red-800 text-center space-y-4">
-                    <div className="w-14 h-14 bg-red-950 text-red-400 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-                      <Plus className="w-8 h-8" />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-xl font-bold text-white">Criar Nova Sala de Amigo Secreto</h3>
-                      <p className="text-slate-300 text-xs max-w-sm mx-auto">
-                        Inicie uma nova sala para gerar o ID de convite aos participantes.
+                adminTab === 'USERS' ? (
+                  <div className="bg-slate-900 rounded-3xl p-6 md:p-8 shadow-xl border border-slate-700 space-y-6">
+                    <div className="border-b border-slate-800 pb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1 rounded-full bg-red-950 text-red-400 font-bold text-xs uppercase tracking-wider border border-red-900/50">
+                          Diretório Global
+                        </span>
+                        <span className="text-xs font-semibold text-slate-400">
+                          {allUsers.length} Participantes Registrados no App
+                        </span>
+                      </div>
+                      <h3 className="text-2xl font-black text-white mt-1">
+                        Pessoas Cadastradas no App
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        Consulte todos os participantes cadastrados, altere grupos familiares, copie senhas para suporte ou remova cadastros duplicados.
                       </p>
                     </div>
-                    <button 
-                      onClick={() => setView('CREATE')}
-                      className="px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-600/20 transition-all flex items-center gap-2 mx-auto"
-                    >
-                      <Plus className="w-5 h-5" />
-                      <span>Criar Nova Sala</span>
-                    </button>
-                  </div>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                        Salas Cadastradas ({allRooms.length})
-                      </h3>
+                    <AdminUsersDirectory
+                      users={allUsers}
+                      rooms={allRooms}
+                      onSuccessMessage={(msg) => setSuccessMessage(msg)}
+                      onErrorMessage={(msg) => setError(msg)}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    {/* Botão Criar Sala DENTRO do Acesso Adm */}
+                    <div className="bg-slate-900 p-8 rounded-3xl shadow-xl border-2 border-dashed border-red-800 text-center space-y-4">
+                      <div className="w-14 h-14 bg-red-950 text-red-400 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+                        <Plus className="w-8 h-8" />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="text-xl font-bold text-white">Criar Nova Sala de Amigo Secreto</h3>
+                        <p className="text-slate-300 text-xs max-w-sm mx-auto">
+                          Inicie uma nova sala para gerar o ID de convite aos participantes.
+                        </p>
+                      </div>
+                      <button 
+                        onClick={() => setView('CREATE')}
+                        className="px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-600/20 transition-all flex items-center gap-2 mx-auto"
+                      >
+                        <Plus className="w-5 h-5" />
+                        <span>Criar Nova Sala</span>
+                      </button>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-3">
-                      {allRooms.map((r, idx) => (
-                        <div 
-                          key={`room-${r.id || idx}`} 
-                          className="bg-slate-900 p-4 rounded-2xl border border-slate-700 flex items-center justify-between hover:border-red-600 transition-colors group"
-                        >
-                          <div className="space-y-1 min-w-0 flex-1">
-                            <h4 className="font-bold text-white text-base truncate">{r.name}</h4>
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs text-slate-300 font-mono shrink-0">ID: {r.id}</p>
-                              <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block ${
-                                r.status === 'FINISHED' 
-                                  ? 'bg-green-900 text-green-200' 
-                                  : 'bg-blue-900 text-blue-200'
-                              }`}>
-                                {r.status === 'FINISHED' ? 'Finalizado' : 'Aguardando'}
-                              </span>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                          Salas Cadastradas ({allRooms.length})
+                        </h3>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-3">
+                        {allRooms.map((r, idx) => (
+                          <div 
+                            key={`room-${r.id || idx}`} 
+                            className="bg-slate-900 p-4 rounded-2xl border border-slate-700 flex items-center justify-between hover:border-red-600 transition-colors group"
+                          >
+                            <div className="space-y-1 min-w-0 flex-1">
+                              <h4 className="font-bold text-white text-base truncate">{r.name}</h4>
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs text-slate-300 font-mono shrink-0">ID: {r.id}</p>
+                                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block ${
+                                  r.status === 'FINISHED' 
+                                    ? 'bg-green-900 text-green-200' 
+                                    : 'bg-blue-900 text-blue-200'
+                                }`}>
+                                  {r.status === 'FINISHED' ? 'Finalizado' : 'Aguardando'}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 ml-3 shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRoomToReset({ id: r.id, name: r.name });
+                                }}
+                                className="p-2.5 bg-amber-900/30 text-amber-400 rounded-xl transition-all"
+                                title="Reutilizar"
+                              >
+                                <RotateCcw className="w-4 h-4" />
+                              </button>
+
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRoomToDelete({ id: r.id, name: r.name });
+                                }}
+                                className="p-2.5 text-slate-500 hover:text-red-500 hover:bg-red-950/20 rounded-xl transition-all"
+                                title="Excluir"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+
+                              <button 
+                                onClick={() => setRoom(r)}
+                                className="p-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-md"
+                                title="Gerenciar"
+                              >
+                                <ArrowRight className="w-4 h-4" />
+                              </button>
                             </div>
                           </div>
-
-                          <div className="flex items-center gap-1.5 ml-3 shrink-0">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setRoomToReset({ id: r.id, name: r.name });
-                              }}
-                              className="p-2.5 bg-amber-900/30 text-amber-400 rounded-xl transition-all"
-                              title="Reutilizar"
-                            >
-                              <RotateCcw className="w-4 h-4" />
-                            </button>
-
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setRoomToDelete({ id: r.id, name: r.name });
-                              }}
-                              className="p-2.5 text-slate-500 hover:text-red-500 hover:bg-red-950/20 rounded-xl transition-all"
-                              title="Excluir"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-
-                            <button 
-                              onClick={() => setRoom(r)}
-                              className="p-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-md"
-                              title="Gerenciar"
-                            >
-                              <ArrowRight className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                      {allRooms.length === 0 && (
-                        <p className="text-center py-12 text-slate-400 text-sm">
-                          Nenhuma sala criada ainda. Clique em "Criar Nova Sala" acima para começar.
-                        </p>
-                      )}
+                        ))}
+                        {allRooms.length === 0 && (
+                          <p className="text-center py-12 text-slate-400 text-sm">
+                            Nenhuma sala criada ainda. Clique em "Criar Nova Sala" acima para começar.
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )
               ) : (
                 <div className="space-y-6">
                   <button 
@@ -1769,6 +1848,7 @@ export default function App() {
                     roomName={room.name}
                     participants={participants}
                     roomStatus={room.status}
+                    allUsers={allUsers}
                     onSuccessMessage={(msg) => setSuccessMessage(msg)}
                     onErrorMessage={(msg) => setError(msg)}
                   />

@@ -13,7 +13,8 @@ import {
   UserPlus,
   Package,
   ShieldCheck,
-  Info
+  Info,
+  Search
 } from 'lucide-react';
 import { 
   doc, 
@@ -42,6 +43,13 @@ interface AdminParticipantManagerProps {
   roomName: string;
   participants: Participant[];
   roomStatus: 'WAITING' | 'DRAWING' | 'FINISHED';
+  allUsers?: {
+    id: string;
+    name: string;
+    password?: string;
+    giftBoxes?: string[];
+    familyGroup?: string;
+  }[];
   onSuccessMessage: (msg: string) => void;
   onErrorMessage: (msg: string) => void;
 }
@@ -51,6 +59,7 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
   roomName,
   participants,
   roomStatus,
+  allUsers = [],
   onSuccessMessage,
   onErrorMessage
 }) => {
@@ -72,6 +81,48 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
   const [newGiftBoxes, setNewGiftBoxes] = useState<string[]>(['', '', '']);
   const [newFamilyGroup, setNewFamilyGroup] = useState('');
   const [isSavingNew, setIsSavingNew] = useState(false);
+
+  // Add existing registered user state
+  const [isSelectingRegistered, setIsSelectingRegistered] = useState(false);
+  const [searchRegistered, setSearchRegistered] = useState('');
+  const [addingUserId, setAddingUserId] = useState<string | null>(null);
+
+  const handleAddRegisteredToRoom = async (u: { id: string; name: string; password?: string; giftBoxes?: string[]; familyGroup?: string }) => {
+    if (roomStatus === 'FINISHED') {
+      onErrorMessage("Não é possível adicionar participantes em um sorteio já finalizado.");
+      return;
+    }
+
+    setAddingUserId(u.id);
+    try {
+      const formattedWishlist = (u.giftBoxes || []).filter(b => b.trim().length > 0).join(', ');
+
+      await setDoc(doc(db, `rooms/${roomId}/participants`, u.id), {
+        name: u.name.trim(),
+        password: u.password?.trim() || '1234',
+        giftBoxes: u.giftBoxes || ['', '', ''],
+        wishlist: formattedWishlist,
+        familyGroup: u.familyGroup?.trim() || '',
+        createdAt: serverTimestamp()
+      });
+
+      festiveAudio.playRegistrationSuccess();
+      onSuccessMessage(`"${u.name.trim()}" foi adicionado(a) à sala com sucesso!`);
+    } catch (err) {
+      console.error("Erro ao adicionar participante registrado à sala:", err);
+      onErrorMessage("Erro ao adicionar participante à sala.");
+    } finally {
+      setAddingUserId(null);
+    }
+  };
+
+  // Filter available registered users not yet in this room
+  const availableUsers = (allUsers || []).filter(u => 
+    !participants.some(p => p.id === u.id || p.name.trim().toLowerCase() === u.name.trim().toLowerCase())
+  ).filter(u => 
+    u.name.toLowerCase().includes(searchRegistered.toLowerCase()) ||
+    (u.familyGroup && u.familyGroup.toLowerCase().includes(searchRegistered.toLowerCase()))
+  );
 
   // Unique family groups for suggestions
   const existingFamilies = Array.from(new Set(participants.map(p => p.familyGroup).filter(Boolean))) as string[];
@@ -272,14 +323,27 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
           </p>
         </div>
 
-        <button
-          onClick={() => setIsAddingNew(true)}
-          disabled={roomStatus === 'FINISHED'}
-          className="px-5 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-red-600/20 transition-all flex items-center gap-2 shrink-0 self-start sm:self-auto"
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Cadastrar Novo Participante</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-start sm:self-auto">
+          <button
+            onClick={() => setIsSelectingRegistered(true)}
+            disabled={roomStatus === 'FINISHED'}
+            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2 cursor-pointer"
+            title="Escolha alguém já cadastrado no app para entrar nesta sala"
+          >
+            <Users className="w-4 h-4" />
+            <span>Adicionar Pessoa Cadastrada</span>
+          </button>
+
+          <button
+            onClick={() => setIsAddingNew(true)}
+            disabled={roomStatus === 'FINISHED'}
+            className="px-4 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-red-600/20 transition-all flex items-center gap-2 cursor-pointer"
+            title="Cadastrar um novo participante do zero"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Cadastrar Manual</span>
+          </button>
+        </div>
       </div>
 
       {/* STRICT PRIVACY BANNER */}
@@ -802,6 +866,120 @@ export const AdminParticipantManager: React.FC<AdminParticipantManagerProps> = (
                 >
                   <Trash2 className="w-4 h-4" />
                   <span>{isDeleting ? "Removendo..." : "Confirmar Remoção"}</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ================= MODAL: SELECT REGISTERED PERSON FROM APP ================= */}
+      <AnimatePresence>
+        {isSelectingRegistered && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-lg bg-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-700 space-y-5 my-8"
+            >
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-emerald-950 text-emerald-400">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-white">
+                      Adicionar Pessoa à Sala
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Escolha participantes já cadastrados no app para entrar em <strong>{roomName}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setIsSelectingRegistered(false)}
+                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Search filter in modal */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchRegistered}
+                  onChange={(e) => setSearchRegistered(e.target.value)}
+                  placeholder="Filtrar por nome ou família..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-slate-700 bg-slate-950 text-white placeholder:text-slate-500 font-semibold text-xs focus:border-emerald-500 outline-none"
+                />
+              </div>
+
+              {/* List of candidates */}
+              <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                {availableUsers.map(u => (
+                  <div
+                    key={`cand-user-${u.id}`}
+                    className="p-3.5 bg-slate-800/90 hover:bg-slate-800 rounded-2xl border border-slate-700 flex items-center justify-between gap-3 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-md">
+                        {u.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-white text-sm truncate">{u.name}</h4>
+                          {u.familyGroup && (
+                            <span className="px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 text-[10px] font-bold border border-purple-800 shrink-0">
+                              {u.familyGroup}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                          <Package className="w-3 h-3 text-red-400" />
+                          <span>{(u.giftBoxes || []).filter(g => g.trim().length > 0).length} presentes desejados</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleAddRegisteredToRoom(u)}
+                      disabled={addingUserId === u.id}
+                      className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5 shrink-0 disabled:opacity-50 cursor-pointer"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>{addingUserId === u.id ? 'Adicionando...' : 'Adicionar'}</span>
+                    </button>
+                  </div>
+                ))}
+
+                {availableUsers.length === 0 && (
+                  <div className="text-center py-8 text-slate-400 space-y-2">
+                    <Users className="w-8 h-8 mx-auto opacity-40 text-emerald-500" />
+                    <p className="text-xs font-semibold">
+                      {searchRegistered 
+                        ? `Nenhum participante disponível com o termo "${searchRegistered}".`
+                        : "Todos os participantes cadastrados no app já estão nesta sala!"}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsSelectingRegistered(false)}
+                  className="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 font-bold text-xs hover:bg-slate-800 cursor-pointer"
+                >
+                  Fechar
                 </button>
               </div>
             </motion.div>
