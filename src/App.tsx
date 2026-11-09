@@ -1690,6 +1690,7 @@ export default function App() {
                       rooms={allRooms}
                       onSuccessMessage={(msg) => setSuccessMessage(msg)}
                       onErrorMessage={(msg) => setError(msg)}
+                      onSelectRoom={(roomId) => fetchRoom(roomId, 'ADMIN')}
                     />
                   </div>
                 ) : (
